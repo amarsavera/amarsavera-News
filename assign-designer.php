@@ -28,48 +28,58 @@ if(!$advertisement)
     die('Advertisement Not Found');
 }
 
+$designers = $pdo->query("
+SELECT
+u.id,
+u.name
+FROM users u
+INNER JOIN designations d
+ON d.id=u.designation_id
+WHERE d.designation_name LIKE '%Designer%'
+AND u.status='active'
+ORDER BY u.name
+")->fetchAll();
+
 if($_SERVER['REQUEST_METHOD']=='POST')
 {
 
-    $update = $pdo->prepare("
-    UPDATE advertisements
-    SET
-    status='published',
-    published_at=NOW(),
-    published_by=?
-    WHERE id=?
-    ");
-
-    $update->execute([
-
-        $_SESSION['admin_id'],
-        $id
-
-    ]);
-
-    $log = $pdo->prepare("
-    INSERT INTO advertisement_publish_logs
+    $assign = $pdo->prepare("
+    INSERT INTO designer_approvals
     (
         advertisement_id,
-        published_by,
-        publish_type,
+        designer_id,
+        status,
         remarks,
+        assigned_by,
         created_at
     )
     VALUES
     (
-        ?,?,?,?,NOW()
+        ?,?,
+        'assigned',
+        ?,
+        ?,
+        NOW()
     )
     ");
 
-    $log->execute([
+    $assign->execute([
 
         $id,
-        $_SESSION['admin_id'],
-        $_POST['publish_type'],
-        $_POST['remarks']
+        $_POST['designer_id'],
+        $_POST['remarks'],
+        $_SESSION['admin_id']
 
     ]);
+
+    $update = $pdo->prepare("
+    UPDATE advertisements
+    SET
+    status='designer_assigned'
+    WHERE id=?
+    ");
+
+    $update->execute([$id]);
 
     header("Location:view.php?id=".$id);
     exit;
@@ -83,9 +93,9 @@ include '../layout/header.php';
 
 <div class="card shadow">
 
-<div class="card-header bg-success text-white">
+<div class="card-header bg-primary text-white">
 
-Publish Advertisement
+Assign Designer
 
 </div>
 
@@ -95,30 +105,29 @@ Publish Advertisement
 
 <div class="mb-3">
 
-<label>Publish Type</label>
+<label>Select Designer</label>
 
 <select
-name="publish_type"
+name="designer_id"
 class="form-control"
 required>
 
-<option value="website">
+<option value="">
 
-Website
-
-</option>
-
-<option value="epaper">
-
-E-Paper
+Select Designer
 
 </option>
 
-<option value="both">
+<?php foreach($designers as $designer): ?>
 
-Website + E-Paper
+<option
+value="<?= $designer['id']; ?>">
+
+<?= htmlspecialchars($designer['name']); ?>
 
 </option>
+
+<?php endforeach; ?>
 
 </select>
 
@@ -126,7 +135,7 @@ Website + E-Paper
 
 <div class="mb-3">
 
-<label>Remarks</label>
+<label>Assignment Remark</label>
 
 <textarea
 name="remarks"
@@ -139,7 +148,7 @@ rows="4"></textarea>
 type="submit"
 class="btn btn-success">
 
-Publish Advertisement
+Assign Designer
 
 </button>
 
