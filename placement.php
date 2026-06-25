@@ -28,32 +28,23 @@ if(!$advertisement)
     die('Advertisement Not Found');
 }
 
+$positions = $pdo->query("
+SELECT *
+FROM ad_positions
+WHERE status='active'
+ORDER BY position_name
+")->fetchAll();
+
 if($_SERVER['REQUEST_METHOD']=='POST')
 {
 
-    $update = $pdo->prepare("
-    UPDATE advertisements
-    SET
-    status='published',
-    published_at=NOW(),
-    published_by=?
-    WHERE id=?
-    ");
-
-    $update->execute([
-
-        $_SESSION['admin_id'],
-        $id
-
-    ]);
-
-    $log = $pdo->prepare("
-    INSERT INTO advertisement_publish_logs
+    $save = $pdo->prepare("
+    INSERT INTO ad_target_locations
     (
         advertisement_id,
-        published_by,
-        publish_type,
-        remarks,
+        position_id,
+        publish_date,
+        publish_time,
         created_at
     )
     VALUES
@@ -62,30 +53,37 @@ if($_SERVER['REQUEST_METHOD']=='POST')
     )
     ");
 
-    $log->execute([
+    $save->execute([
 
         $id,
-        $_SESSION['admin_id'],
-        $_POST['publish_type'],
-        $_POST['remarks']
+        $_POST['position_id'],
+        $_POST['publish_date'],
+        $_POST['publish_time']
 
     ]);
+
+    $update = $pdo->prepare("
+    UPDATE advertisements
+    SET status='placement_done'
+    WHERE id=?
+    ");
+
+    $update->execute([$id]);
 
     header("Location:view.php?id=".$id);
     exit;
 }
 
 include '../layout/header.php';
-
 ?>
 
 <div class="container-fluid">
 
 <div class="card shadow">
 
-<div class="card-header bg-success text-white">
+<div class="card-header bg-primary text-white">
 
-Publish Advertisement
+Advertisement Placement
 
 </div>
 
@@ -95,30 +93,23 @@ Publish Advertisement
 
 <div class="mb-3">
 
-<label>Publish Type</label>
+<label>Position</label>
 
 <select
-name="publish_type"
+name="position_id"
 class="form-control"
 required>
 
-<option value="website">
+<?php foreach($positions as $position): ?>
 
-Website
+<option
+value="<?= $position['id']; ?>">
 
-</option>
-
-<option value="epaper">
-
-E-Paper
+<?= htmlspecialchars($position['position_name']); ?>
 
 </option>
 
-<option value="both">
-
-Website + E-Paper
-
-</option>
+<?php endforeach; ?>
 
 </select>
 
@@ -126,12 +117,25 @@ Website + E-Paper
 
 <div class="mb-3">
 
-<label>Remarks</label>
+<label>Publish Date</label>
 
-<textarea
-name="remarks"
+<input
+type="date"
+name="publish_date"
 class="form-control"
-rows="4"></textarea>
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>Publish Time</label>
+
+<input
+type="time"
+name="publish_time"
+class="form-control"
+required>
 
 </div>
 
@@ -139,7 +143,7 @@ rows="4"></textarea>
 type="submit"
 class="btn btn-success">
 
-Publish Advertisement
+Save Placement
 
 </button>
 

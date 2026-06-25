@@ -34,18 +34,12 @@ if(!$booking)
 if($_SERVER['REQUEST_METHOD']=='POST')
 {
 
-    if(empty(trim($_POST['remarks'])))
-    {
-        die('Reject Reason Required');
-    }
-
     $update = $pdo->prepare("
     UPDATE advertisement_bookings
     SET
-    status='rejected',
-    rejected_by=?,
-    rejected_at=NOW(),
-    rejection_reason=?
+    status='approved',
+    approved_by=?,
+    approved_at=NOW()
     WHERE id=?
     ");
 
@@ -53,13 +47,11 @@ if($_SERVER['REQUEST_METHOD']=='POST')
 
         $_SESSION['admin_id'],
 
-        trim($_POST['remarks']),
-
         $id
 
     ]);
 
-    $approvalLog = $pdo->prepare("
+    $log = $pdo->prepare("
     INSERT INTO approval_logs
     (
         module_name,
@@ -71,22 +63,22 @@ if($_SERVER['REQUEST_METHOD']=='POST')
     )
     VALUES
     (
-        ?,?,?,?,?,
+        'Advertisement Booking',
+        ?,
+        ?,
+        'approved',
+        ?,
         NOW()
     )
     ");
 
-    $approvalLog->execute([
-
-        'Advertisement Booking',
+    $log->execute([
 
         $id,
 
         $_SESSION['admin_id'],
 
-        'rejected',
-
-        trim($_POST['remarks'])
+        $_POST['remarks']
 
     ]);
 
@@ -116,11 +108,11 @@ if($_SERVER['REQUEST_METHOD']=='POST')
 
         'Advertisement Booking',
 
-        'Reject Booking',
+        'Approve Booking',
 
         $id,
 
-        trim($_POST['remarks']),
+        $_POST['remarks'],
 
         $_SERVER['REMOTE_ADDR'] ?? ''
 
@@ -141,9 +133,9 @@ include '../layout/header.php';
 
 <div class="card shadow">
 
-<div class="card-header bg-danger text-white">
+<div class="card-header bg-success text-white">
 
-Reject Advertisement Booking
+Approve Advertisement Booking
 
 </div>
 
@@ -167,23 +159,23 @@ $booking['booking_code']
 
 <label>
 
-Reject Reason
+Approval Remarks
 
 </label>
 
 <textarea
 name="remarks"
 class="form-control"
-rows="5"
+rows="4"
 required></textarea>
 
 </div>
 
 <button
 type="submit"
-class="btn btn-danger">
+class="btn btn-success">
 
-Reject Booking
+Approve Booking
 
 </button>
 
