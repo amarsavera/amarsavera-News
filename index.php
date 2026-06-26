@@ -2,7 +2,7 @@
 
 require_once '../../includes/config.php';
 
-if(session_status()===PHP_SESSION_NONE){
+if(session_status() === PHP_SESSION_NONE){
     session_start();
 }
 
@@ -11,38 +11,33 @@ if(!isset($_SESSION['admin_id'])){
     exit;
 }
 
-$tehsils = $pdo->query("
+$users = $pdo->query("
 SELECT
-t.*,
-s.state_name,
-dv.division_name,
-d.district_name
-
-FROM tehsils t
-
-LEFT JOIN states s
-ON s.id=t.state_id
-
-LEFT JOIN divisions dv
-ON dv.id=t.division_id
-
-LEFT JOIN districts d
-ON d.id=t.district_id
-
-ORDER BY t.tehsil_name ASC
+id,
+name,
+mobile,
+email,
+employee_code,
+status,
+preferred_language,
+created_at
+FROM users
+ORDER BY id DESC
 ")->fetchAll();
 
 include '../layout/header.php';
+
 ?>
 
 <div class="container-fluid">
 
-<div class="d-flex justify-content-between mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3">
 
-<h3>Tehsil Management</h3>
+<h3>उपयोगकर्ता प्रबंधन</h3>
 
-<a href="create.php" class="btn btn-success">
-Add Tehsil
+<a href="add.php" class="btn btn-success">
+<i class="fa fa-plus"></i>
+नया उपयोगकर्ता
 </a>
 
 </div>
@@ -51,57 +46,81 @@ Add Tehsil
 
 <div class="card-body">
 
-<table class="table table-bordered">
+<div class="table-responsive">
+
+<table class="table table-bordered table-hover">
 
 <thead class="table-dark">
 
-<tr>
 <th>ID</th>
-<th>State</th>
-<th>Division</th>
-<th>District</th>
-<th>Tehsil</th>
+<th>Name</th>
+<th>Mobile</th>
+<th>Email</th>
+<th>Department</th>
+<th>Role</th>
+<th>Designation</th>
 <th>Status</th>
-<th>Action</th>
-</tr>
+<th>Language</th>
+<th>Action</th>>
 
 </thead>
 
 <tbody>
 
-<?php foreach($tehsils as $row): ?>
+<?php foreach($users as $user): ?>
 
 <tr>
 
-<td><?= $row['id']; ?></td>
-<td><?= htmlspecialchars($row['state_name']); ?></td>
-<td><?= htmlspecialchars($row['division_name']); ?></td>
-<td><?= htmlspecialchars($row['district_name']); ?></td>
-<td><?= htmlspecialchars($row['tehsil_name']); ?></td>
+<td><?= $user['id']; ?></td>
 
+<td><?= htmlspecialchars($user['name']); ?></td>
+
+<td><?= htmlspecialchars($user['mobile']); ?></td>
+
+<td><?= htmlspecialchars($user['email']); ?></td>
+
+<td><?= htmlspecialchars($user['employee_code']); ?></td>
+
+<td><?= htmlspecialchars($user['preferred_language']); ?></td>
+<td><?= htmlspecialchars($user['department_name'] ?? '-'); ?></td>
+
+<td><?= htmlspecialchars($user['role_name'] ?? '-'); ?></td>
+
+<td><?= htmlspecialchars($user['designation_name'] ?? '-'); ?></td>
 <td>
 
-<?= $row['status']=='active'
-? '<span class="badge bg-success">Active</span>'
-: '<span class="badge bg-danger">Inactive</span>'; ?>
+<?php if($user['status']=='active'): ?>
+
+<span class="badge bg-success">
+सक्रिय
+</span>
+
+<?php else: ?>
+
+<span class="badge bg-danger">
+निष्क्रिय
+</span>
+
+<?php endif; ?>
 
 </td>
 
 <td>
 
-<a href="edit.php?id=<?= $row['id']; ?>"
-class="btn btn-primary btn-sm">
-
-Edit
-
+<a href="view.php?id=<?= $user['id']; ?>"
+class="btn btn-info btn-sm">
+देखें
 </a>
 
-<a href="delete.php?id=<?= $row['id']; ?>"
+<a href="edit.php?id=<?= $user['id']; ?>"
+class="btn btn-primary btn-sm">
+संपादित
+</a>
+
+<a href="delete.php?id=<?= $user['id']; ?>"
 class="btn btn-danger btn-sm"
-onclick="return confirm('Delete Tehsil?');">
-
-Delete
-
+onclick="return confirm('Delete User?');">
+हटाएँ
 </a>
 
 </td>
@@ -113,6 +132,8 @@ Delete
 </tbody>
 
 </table>
+
+</div>
 
 </div>
 

@@ -13,6 +13,33 @@ if(!isset($_SESSION['admin_id'])){
 
 $id = (int)($_GET['id'] ?? 0);
 
+$departments = $pdo->query("
+SELECT id,department_name
+FROM departments
+WHERE status='active'
+ORDER BY department_name
+")->fetchAll();
+
+$roles = $pdo->query("
+SELECT id,role_name
+FROM roles
+ORDER BY role_name
+")->fetchAll();
+
+$designations = $pdo->query("
+SELECT id,designation_name
+FROM designations
+WHERE status='active'
+ORDER BY designation_name
+")->fetchAll();
+
+$languages = $pdo->query("
+SELECT language_code,language_name
+FROM languages
+WHERE status=1
+ORDER BY language_name
+")->fetchAll();
+
 $stmt = $pdo->prepare("
 SELECT *
 FROM users
@@ -28,38 +55,11 @@ if(!$user){
     die('User Not Found');
 }
 
-$departments = $pdo->query("
-SELECT id,department_name
-FROM departments
-WHERE status='active'
-ORDER BY department_name ASC
-")->fetchAll();
-
-$roles = $pdo->query("
-SELECT id,role_name
-FROM roles
-ORDER BY role_name ASC
-")->fetchAll();
-
-$designations = $pdo->query("
-SELECT id,designation_name
-FROM designations
-WHERE status='active'
-ORDER BY designation_name ASC
-")->fetchAll();
-
-$languages = $pdo->query("
-SELECT language_code,language_name
-FROM languages
-WHERE status=1
-ORDER BY language_name ASC
-")->fetchAll();
-
 if($_SERVER['REQUEST_METHOD']=='POST'){
 
-    $sql = "
-    UPDATE users SET
-
+    $stmt = $pdo->prepare("
+    UPDATE users
+    SET
     name=?,
     mobile=?,
     email=?,
@@ -68,11 +68,8 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
     designation_id=?,
     preferred_language=?,
     status=?
-
     WHERE id=?
-    ";
-
-    $stmt = $pdo->prepare($sql);
+    ");
 
     $stmt->execute([
 
@@ -88,39 +85,69 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 
     ]);
 
-    header('Location:view.php?id='.$id);
+    $log = $pdo->prepare("
+    INSERT INTO activity_logs
+    (
+        user_type,
+        user_id,
+        module_name,
+        action_name,
+        record_id,
+        remarks,
+        ip_address
+    )
+    VALUES
+    (
+        ?,?,?,?,?,?,?
+    )
+    ");
+
+    $log->execute([
+        'admin',
+        $_SESSION['admin_id'],
+        'Users',
+        'Update User',
+        $id,
+        'User Updated',
+        $_SERVER['REMOTE_ADDR']
+    ]);
+
+    header("Location: view.php?id=".$id);
     exit;
 }
 
 include '../layout/header.php';
-?><div class="container-fluid"><div class="card shadow-sm"><div class="card-header bg-primary text-white">Edit User
+?><div class="container-fluid"><div class="card shadow-sm"><div class="card-header bg-warning">उपयोगकर्ता संपादन
 
 </div><div class="card-body"><form method="post"><div class="row"><div class="col-md-6 mb-3">
-<label>Name</label>
+<label>नाम</label>
 <input type="text"
 name="name"
 value="<?= htmlspecialchars($user['name']); ?>"
-class="form-control"
-required>
+class="form-control">
 </div><div class="col-md-6 mb-3">
-<label>Mobile</label>
+<label>मोबाइल</label>
 <input type="text"
 name="mobile"
 value="<?= htmlspecialchars($user['mobile']); ?>"
 class="form-control">
 </div><div class="col-md-6 mb-3">
-<label>Email</label>
+<label>ईमेल</label>
 <input type="email"
 name="email"
 value="<?= htmlspecialchars($user['email']); ?>"
 class="form-control">
 </div><div class="col-md-6 mb-3">
-<label>Department</label><select name="department_id"
+<label>स्थिति</label><select name="status"
 class="form-control">
 
-<?php foreach($departments as $d): ?><option
-value="<?= $d['id']; ?>"
-<?= $user['department_id']==$d['id']?'selected':''; ?>><?= htmlspecialchars($d['department_name']); ?></option><?php endforeach; ?></select></div></div><button
+<option value="active"
+<?= $user['status']=='active'?'selected':''; ?>>
+Active
+</option><option value="inactive"
+<?= $user['status']=='inactive'?'selected':''; ?>>
+Inactive
+</option></select></div></div><button
 type="submit"
 class="btn btn-success">
 

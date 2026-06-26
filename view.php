@@ -15,56 +15,78 @@ $id = (int)($_GET['id'] ?? 0);
 
 $stmt = $pdo->prepare("
 SELECT
-s.*,
-sp.plan_name
+u.*,
+r.role_name,
+d.department_name,
+dg.designation_name
 
-FROM subscribers s
+FROM users u
 
-LEFT JOIN subscription_plans sp
-ON sp.id=s.plan_id
+LEFT JOIN roles r
+ON r.id=u.role_id
 
-WHERE s.id=?
+LEFT JOIN departments d
+ON d.id=u.department_id
+
+LEFT JOIN designations dg
+ON dg.id=u.designation_id
+
+WHERE u.id=?
 LIMIT 1
 ");
 
 $stmt->execute([$id]);
 
-$subscriber = $stmt->fetch();
+$user = $stmt->fetch();
 
-if(!$subscriber){
-    die('Subscriber Not Found');
+if(!$user){
+    die('User Not Found');
 }
 
 include '../layout/header.php';
-?><div class="container-fluid"><div class="card shadow-sm"><div class="card-header bg-info text-white">Subscriber Details
+?><div class="container-fluid"><div class="card shadow-sm"><div class="card-header bg-primary text-white">उपयोगकर्ता विवरण
 
 </div><div class="card-body"><table class="table table-bordered"><tr>
 <th>UID</th>
-<td><?= htmlspecialchars($subscriber['uid']); ?></td>
+<td><?= htmlspecialchars($user['uid']); ?></td>
 </tr><tr>
-<th>Name</th>
-<td><?= htmlspecialchars($subscriber['name']); ?></td>
+<th>Employee Code</th>
+<td><?= htmlspecialchars($user['employee_code']); ?></td>
 </tr><tr>
-<th>Mobile</th>
-<td><?= htmlspecialchars($subscriber['mobile']); ?></td>
+<th>नाम</th>
+<td><?= htmlspecialchars($user['name']); ?></td>
 </tr><tr>
-<th>Email</th>
-<td><?= htmlspecialchars($subscriber['email']); ?></td>
+<th>मोबाइल</th>
+<td><?= htmlspecialchars($user['mobile']); ?></td>
 </tr><tr>
-<th>Plan</th>
-<td><?= htmlspecialchars($subscriber['plan_name']); ?></td>
+<th>ईमेल</th>
+<td><?= htmlspecialchars($user['email']); ?></td>
 </tr><tr>
-<th>Status</th>
-<td><?= htmlspecialchars($subscriber['status']); ?></td>
+<th>विभाग</th>
+<td><?= htmlspecialchars($user['department_name']); ?></td>
 </tr><tr>
-<th>Source System</th>
-<td><?= htmlspecialchars($subscriber['source_system']); ?></td>
+<th>रोल</th>
+<td><?= htmlspecialchars($user['role_name']); ?></td>
 </tr><tr>
-<th>Created</th>
-<td><?= htmlspecialchars($subscriber['created_at']); ?></td>
-</tr></table><a href="edit.php?id=<?= $subscriber['id']; ?>"
+<th>पदनाम</th>
+<td><?= htmlspecialchars($user['designation_name']); ?></td>
+</tr><tr>
+<th>भाषा</th>
+<td><?= htmlspecialchars($user['preferred_language']); ?></td>
+</tr><tr>
+<th>स्थिति</th>
+<td><?= htmlspecialchars($user['status']); ?></td>
+</tr><tr>
+<th>Source</th>
+<td><?= htmlspecialchars($user['source_system']); ?></td>
+</tr></table><a href="update.php?id=<?= $user['id']; ?>"
 class="btn btn-primary">
 
-Edit Subscriber
+Edit User
+
+</a><a href="index.php"
+class="btn btn-secondary">
+
+Back
 
 </a></div></div></div><?php include '../layout/footer.php'; ?>
