@@ -10,27 +10,22 @@ exit;
 }
 
 include '../layout/header.php';
-
 ?>
 
 <div class="container-fluid">
 
 <div class="row">
 
-<div class="col-md-3 mb-3">
+<div class="col-md-3">
 
 <div class="card">
 
-<div class="card-body text-center">
+<div class="card-body">
 
-<h5>User Rights</h5>
+<h5>Users</h5>
 
-<a
-href="../users/rights/index.php"
-class="btn btn-danger">
-
+<a href="../users/index.php">
 Manage
-
 </a>
 
 </div>
@@ -39,20 +34,16 @@ Manage
 
 </div>
 
-<div class="col-md-3 mb-3">
+<div class="col-md-3">
 
 <div class="card">
 
-<div class="card-body text-center">
+<div class="card-body">
 
-<h5>Override Control</h5>
+<h5>Rights</h5>
 
-<a
-href="override.php"
-class="btn btn-primary">
-
-Open
-
+<a href="../users/rights/index.php">
+Manage
 </a>
 
 </div>
@@ -61,20 +52,16 @@ Open
 
 </div>
 
-<div class="col-md-3 mb-3">
+<div class="col-md-3">
 
 <div class="card">
 
-<div class="card-body text-center">
+<div class="card-body">
 
-<h5>Approval Center</h5>
+<h5>Roles</h5>
 
-<a
-href="../approval-center/index.php"
-class="btn btn-success">
-
-Open
-
+<a href="../rbac/roles/index.php">
+Manage
 </a>
 
 </div>
@@ -83,20 +70,16 @@ Open
 
 </div>
 
-<div class="col-md-3 mb-3">
+<div class="col-md-3">
 
 <div class="card">
 
-<div class="card-body text-center">
+<div class="card-body">
 
-<h5>System Audit</h5>
+<h5>Activity Logs</h5>
 
-<a
-href="../audit/index.php"
-class="btn btn-dark">
-
-Open
-
+<a href="../activity-logs/index.php">
+View
 </a>
 
 </div>
