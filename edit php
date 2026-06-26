@@ -1,0 +1,55 @@
+<?php
+
+require_once '../../includes/config.php';
+
+session_start();
+
+if(!isset($_SESSION['admin_id'])){
+    header("Location: ../index.php");
+    exit;
+}
+
+$id=(int)($_GET['id']??0);
+
+$stmt=$pdo->prepare("
+SELECT *
+FROM tehsils
+WHERE id=?
+");
+
+$stmt->execute([$id]);
+
+$tehsil=$stmt->fetch();
+
+if(!$tehsil){
+    die('Tehsil Not Found');
+}
+
+if($_SERVER['REQUEST_METHOD']=='POST'){
+
+    $update=$pdo->prepare("
+    UPDATE tehsils
+    SET
+    state_id=?,
+    division_id=?,
+    district_id=?,
+    tehsil_name=?,
+    status=?
+    WHERE id=?
+    ");
+
+    $update->execute([
+
+        $_POST['state_id'],
+        $_POST['division_id'],
+        $_POST['district_id'],
+        $_POST['tehsil_name'],
+        $_POST['status'],
+        $id
+
+    ]);
+
+    header("Location:index.php");
+    exit;
+}
+?>
