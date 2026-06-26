@@ -1,0 +1,394 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:"Nirmala UI",sans-serif;
+background:#f5f5f5;
+color:#222;
+}
+
+/* Top Bar */
+
+.top-bar{
+background:#111;
+color:#fff;
+padding:8px 0;
+font-size:14px;
+}
+
+.top-bar a{
+color:#fff;
+margin-left:10px;
+}
+
+/* Header */
+
+.site-header{
+padding:15px 0;
+min-height:auto;
+}
+
+.topbar{
+background:#ffffff;
+padding:8px 0 !important;
+min-height:auto !important;
+}
+
+.logo-area{
+display:none;
+}
+
+.site-header{
+padding:0 !important;
+margin:0 !important;
+height:auto !important;
+min-height:auto !important;
+}
+
+.header-banner{
+margin-top:0 !important;
+}
+
+/* Navbar */
+
+.main-navbar{
+background:#d50000 !important;
+}
+
+.main-navbar .nav-link{
+color:#fff !important;
+font-weight:600;
+}
+.main-menu{
+background:#c60000;
+}
+
+.main-menu .nav-link{
+color:#fff!important;
+font-weight:600;
+padding:15px 18px;
+}
+
+.main-menu .nav-link:hover{
+background:#a50000;
+}
+/* Hero */
+
+.hero-section{
+padding:30px 0;
+}
+
+.hero-news{
+position:relative;
+overflow:hidden;
+border-radius:10px;
+}
+
+.hero-news img{
+width:100%;
+height:500px;
+object-fit:cover;
+}
+
+.hero-overlay{
+position:absolute;
+bottom:0;
+left:0;
+right:0;
+padding:25px;
+background:linear-gradient(
+transparent,
+rgba(0,0,0,.9)
+);
+color:#fff;
+}
+
+.live-update-box{
+background:#fff;
+border:1px solid #ddd;
+height:500px;
+overflow:auto;
+}
+
+.live-header{
+background:#c40000;
+color:#fff;
+padding:15px;
+font-size:22px;
+font-weight:700;
+}
+
+.live-item{
+padding:12px;
+border-bottom:1px solid #eee;
+}
+
+.live-time{
+color:#c40000;
+font-weight:bold;
+display:block;
+margin-bottom:5px;
+}
+
+.category-badge{
+display:inline-block;
+background:#d50000;
+padding:6px 15px;
+border-radius:5px;
+margin-bottom:10px;
+}
+
+/* News Section */
+
+.news-section{
+padding:40px 0;
+}
+
+.section-title{
+font-size:30px;
+font-weight:700;
+margin-bottom:25px;
+border-left:5px solid #d50000;
+padding-left:15px;
+color:#d50000;
+}
+
+.news-card{
+background:#fff;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+height:100%;
+}
+
+.news-card img{
+width:100%;
+height:220px;
+object-fit:cover;
+}
+
+.news-content{
+padding:15px;
+}
+
+.news-content h5,
+.news-content h6{
+font-weight:700;
+margin-bottom:10px;
+}
+
+.read-more{
+display:inline-block;
+padding:8px 15px;
+background:#d50000;
+color:#fff;
+text-decoration:none;
+border-radius:5px;
+margin-top:10px;
+}
+
+.read-more:hover{
+background:#b71c1c;
+color:#fff;
+}
+
+/* Footer */
+
+.footer{
+background:#111;
+color:#fff;
+padding:50px 0 20px;
+margin-top:40px;
+}
+
+.footer h4{
+margin-bottom:15px;
+}
+
+.footer-links{
+list-style:none;
+padding:0;
+}
+
+.footer-links li{
+margin-bottom:8px;
+}
+
+.footer-links a{
+color:#ddd;
+text-decoration:none;
+}
+
+.footer-bottom{
+text-align:center;
+margin-top:20px;
+}
+
+@media(max-width:768px){
+
+.site-title{
+font-size:34px;
+}
+
+.hero-news img{
+height:260px;
+}
+
+.hero-overlay h2{
+font-size:24px;
+}
+
+}
+.breaking-news{
+background:#d50000;
+color:#fff;
+padding:10px;
+font-weight:700;
+}
+
+.news-card{
+transition:all .3s ease;
+}
+
+.news-card:hover{
+transform:translateY(-5px);
+box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.site-header{
+background:linear-gradient(135deg,#ffffff,#f8f8f8);
+}
+
+.hero-news{
+box-shadow:0 10px 30px rgba(0,0,0,.15);
+}
+
+.section-title{
+text-transform:uppercase;
+letter-spacing:1px;
+}
+
+.title{
+font-family:'Noto Sans Devanagari','Mangal','Nirmala UI',sans-serif;
+font-size:58px;
+font-weight:800;
+line-height:1.2;
+color:#c40000;
+text-align:center;
+}
+
+.tagline{
+font-family:'Noto Sans Devanagari','Mangal','Nirmala UI',sans-serif;
+font-size:28px;
+font-weight:600;
+color:#333;
+text-align:center;
+
+margin-top:10px;
+}
+
+/* =========================================
+   AMAR SAVERA PROFESSIONAL UPGRADE
+========================================= */
+
+.site-header{
+box-shadow:0 2px 15px rgba(0,0,0,.08);
+position:relative;
+z-index:100;
+}
+
+.main-navbar{
+box-shadow:0 3px 12px rgba(0,0,0,.15);
+}
+
+.navbar-brand{
+font-size:24px;
+font-weight:700;
+letter-spacing:1px;
+}
+
+.main-navbar .nav-link{
+padding:12px 15px;
+transition:.3s;
+}
+
+.main-navbar .nav-link:hover{
+background:rgba(255,255,255,.15);
+border-radius:5px;
+}
+
+.breaking-news{
+overflow:hidden;
+white-space:nowrap;
+}
+
+.hero-news{
+border-radius:12px;
+overflow:hidden;
+}
+
+.hero-news img{
+transition:all .5s ease;
+}
+
+.hero-news:hover img{
+transform:scale(1.03);
+}
+
+.news-card{
+transition:all .3s ease;
+border:1px solid rgba(0,0,0,.05);
+}
+
+.news-card:hover{
+transform:translateY(-5px);
+box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.news-content h5,
+.news-content h6{
+line-height:1.5;
+}
+
+.read-more{
+transition:.3s;
+}
+
+.read-more:hover{
+transform:translateY(-2px);
+}
+
+.footer{
+border-top:4px solid #d50000;
+}
+
+/* Splash Logo */
+
+#splash-screen{
+backdrop-filter:blur(3px);
+}
+
+#splash-video{
+filter:drop-shadow(0 0 20px rgba(213,0,0,.25));
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+
+.news-section{
+padding:25px 0;
+}
+
+.section-title{
+font-size:24px;
+}
+
+.news-card img{
+height:180px;
+}
+
+}
