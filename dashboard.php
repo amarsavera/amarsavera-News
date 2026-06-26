@@ -9,114 +9,34 @@ if(session_status()===PHP_SESSION_NONE)
 
 if(!isset($_SESSION['admin_id']))
 {
-    header("Location: ../index.php');
+    header("Location: ../index.php");
     exit;
 }
 
-$employeeCode =
-$_SESSION['employee_code'] ?? '';
-
-$month = date('m');
-$year  = date('Y');
-
-/*
-|--------------------------------------------------------------------------
-| News Target
-|--------------------------------------------------------------------------
-*/
-
-$target = $pdo->prepare("
-SELECT *
-FROM hrms_targets
-WHERE employee_code=?
-AND target_month=?
-AND target_year=?
-LIMIT 1
-");
-
-$target->execute([
-$employeeCode,
-$month,
-$year
-]);
-
-$targetData =
-$target->fetch();
-
-/*
-|--------------------------------------------------------------------------
-| News Count
-|--------------------------------------------------------------------------
-*/
-
-$newsCount = $pdo->prepare("
+$totalFacebookPosts = $pdo->query("
 SELECT COUNT(*)
-FROM news
-WHERE reporter_code=?
-AND MONTH(created_at)=?
-AND YEAR(created_at)=?
-");
+FROM social_facebook_posts
+")->fetchColumn();
 
-$newsCount->execute([
+$totalYoutubePosts = $pdo->query("
+SELECT COUNT(*)
+FROM social_youtube_posts
+")->fetchColumn();
 
-$employeeCode,
-$month,
-$year
+$totalInstagramPosts = $pdo->query("
+SELECT COUNT(*)
+FROM social_instagram_posts
+")->fetchColumn();
 
-]);
+$totalTwitterPosts = $pdo->query("
+SELECT COUNT(*)
+FROM social_twitter_posts
+")->fetchColumn();
 
-$totalNews =
-$newsCount->fetchColumn();
-
-/*
-|--------------------------------------------------------------------------
-| Advertisement Revenue
-|--------------------------------------------------------------------------
-*/
-
-$adsRevenue = $pdo->prepare("
-SELECT IFNULL(SUM(total_amount),0)
-FROM advertisement_bookings
-WHERE executive_code=?
-AND MONTH(created_at)=?
-AND YEAR(created_at)=?
-");
-
-$adsRevenue->execute([
-
-$employeeCode,
-$month,
-$year
-
-]);
-
-$totalAdsRevenue =
-$adsRevenue->fetchColumn();
-
-/*
-|--------------------------------------------------------------------------
-| Collections
-|--------------------------------------------------------------------------
-*/
-
-$collection = $pdo->prepare("
-SELECT IFNULL(SUM(payment_amount),0)
-FROM payment_transactions
-WHERE executive_code=?
-AND MONTH(payment_date)=?
-AND YEAR(payment_date)=?
-");
-
-$collection->execute([
-
-$employeeCode,
-$month,
-$year
-
-]);
-
-$totalCollection =
-$collection->fetchColumn();
+$totalCampaigns = $pdo->query("
+SELECT COUNT(*)
+FROM social_campaigns
+")->fetchColumn();
 
 include '../layout/header.php';
 
@@ -126,29 +46,69 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Reporter Dashboard
+Social Media Command Center
 
 </h3>
 
 <div class="row">
 
-<div class="col-md-3">
+<div class="col-md-2">
 
 <div class="card border-primary">
 
 <div class="card-body text-center">
 
-<h2>
+<h4><?= $totalFacebookPosts; ?></h4>
 
-<?= $totalNews; ?>
+<p>Facebook</p>
 
-</h2>
+</div>
 
-<p>
+</div>
 
-News Published
+</div>
 
-</p>
+<div class="col-md-2">
+
+<div class="card border-danger">
+
+<div class="card-body text-center">
+
+<h4><?= $totalYoutubePosts; ?></h4>
+
+<p>YouTube</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-2">
+
+<div class="card border-warning">
+
+<div class="card-body text-center">
+
+<h4><?= $totalInstagramPosts; ?></h4>
+
+<p>Instagram</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card border-dark">
+
+<div class="card-body text-center">
+
+<h4><?= $totalTwitterPosts; ?></h4>
+
+<p>X / Twitter</p>
 
 </div>
 
@@ -162,17 +122,9 @@ News Published
 
 <div class="card-body text-center">
 
-<h2>
+<h4><?= $totalCampaigns; ?></h4>
 
-₹<?= number_format($totalAdsRevenue); ?>
-
-</h2>
-
-<p>
-
-Advertisement Revenue
-
-</p>
+<p>Campaigns</p>
 
 </div>
 
@@ -180,47 +132,83 @@ Advertisement Revenue
 
 </div>
 
-<div class="col-md-3">
+</div>
 
-<div class="card border-warning">
+<div class="card shadow mt-4">
 
-<div class="card-body text-center">
+<div class="card-header bg-primary text-white">
 
-<h2>
-
-₹<?= number_format($totalCollection); ?>
-
-</h2>
-
-<p>
-
-Collections
-
-</p>
+Social Media Control Panel
 
 </div>
 
-</div>
+<div class="card-body">
+
+<div class="row">
+
+<div class="col-md-2 mb-2">
+
+<a href="facebook.php"
+class="btn btn-primary w-100">
+
+Facebook
+
+</a>
 
 </div>
 
-<div class="col-md-3">
+<div class="col-md-2 mb-2">
 
-<div class="card border-danger">
+<a href="youtube.php"
+class="btn btn-danger w-100">
 
-<div class="card-body text-center">
+YouTube
 
-<h2>
+</a>
 
-<?= $targetData['achievement_percentage'] ?? 0; ?>%
+</div>
 
-</h2>
+<div class="col-md-2 mb-2">
 
-<p>
+<a href="instagram.php"
+class="btn btn-warning w-100">
 
-Overall Achievement
+Instagram
 
-</p>
+</a>
+
+</div>
+
+<div class="col-md-2 mb-2">
+
+<a href="x-twitter.php"
+class="btn btn-dark w-100">
+
+X/Twitter
+
+</a>
+
+</div>
+
+<div class="col-md-2 mb-2">
+
+<a href="scheduler.php"
+class="btn btn-success w-100">
+
+Scheduler
+
+</a>
+
+</div>
+
+<div class="col-md-2 mb-2">
+
+<a href="campaigns.php"
+class="btn btn-info w-100">
+
+Campaigns
+
+</a>
 
 </div>
 
@@ -234,75 +222,26 @@ Overall Achievement
 
 <div class="card-header bg-success text-white">
 
-Current Month Target
+Social Media Workflow
 
 </div>
 
 <div class="card-body">
 
-<table class="table table-bordered">
-
-<tr>
-
-<th>News Target</th>
-
-<td>
-
-<?= $targetData['news_target'] ?? 0; ?>
-
-</td>
-
-<th>Achieved</th>
-
-<td>
-
-<?= $targetData['news_achieved'] ?? 0; ?>
-
-</td>
-
-</tr>
-
-<tr>
-
-<th>Advertisement Target</th>
-
-<td>
-
-<?= $targetData['advertisement_target'] ?? 0; ?>
-
-</td>
-
-<th>Achieved</th>
-
-<td>
-
-<?= $targetData['advertisement_achieved'] ?? 0; ?>
-
-</td>
-
-</tr>
-
-<tr>
-
-<th>Collection Target</th>
-
-<td>
-
-<?= $targetData['collection_target'] ?? 0; ?>
-
-</td>
-
-<th>Achieved</th>
-
-<td>
-
-<?= $targetData['collection_achieved'] ?? 0; ?>
-
-</td>
-
-</tr>
-
-</table>
+<pre>
+News Published
+       ↓
+Auto Social Distribution
+       ↓
+Facebook
+Instagram
+YouTube
+X (Twitter)
+       ↓
+Audience Reach
+       ↓
+Analytics
+</pre>
 
 </div>
 
@@ -310,53 +249,41 @@ Current Month Target
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-dark text-white">
+<div class="card-header bg-info text-white">
 
-Quick Actions
+Features
 
 </div>
 
 <div class="card-body">
 
-<a
-href="assignments.php"
-class="btn btn-primary">
+<ul>
 
-Assignments
+<li>Facebook Publishing</li>
 
-</a>
+<li>YouTube Publishing</li>
 
-<a
-href="my-news.php"
-class="btn btn-success">
+<li>Instagram Publishing</li>
 
-My News
+<li>X (Twitter) Publishing</li>
 
-</a>
+<li>Post Scheduling</li>
 
-<a
-href="performance.php"
-class="btn btn-warning">
+<li>Campaign Management</li>
 
-Performance
+<li>Auto News Sharing</li>
 
-</a>
+<li>Social Analytics</li>
 
-<a
-href="wallet.php"
-class="btn btn-info">
+<li>Audience Engagement</li>
 
-Wallet
+<li>Hashtag Management</li>
 
-</a>
+<li>Social Reports</li>
 
-<a
-href="incentives.php"
-class="btn btn-dark">
+<li>Multi Platform Posting</li>
 
-Incentives
-
-</a>
+</ul>
 
 </div>
 

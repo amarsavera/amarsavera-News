@@ -13,35 +13,29 @@ if(!isset($_SESSION['admin_id']))
     exit;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Recruitment Reports Dashboard
-|--------------------------------------------------------------------------
-*/
-
-$totalVacancies = $pdo->query("
+$totalFacebook = $pdo->query("
 SELECT COUNT(*)
-FROM recruitment_vacancies
+FROM social_facebook_posts
 ")->fetchColumn();
 
-$totalApplications = $pdo->query("
+$totalYoutube = $pdo->query("
 SELECT COUNT(*)
-FROM recruitment_applications
+FROM social_youtube_posts
 ")->fetchColumn();
 
-$totalInterviews = $pdo->query("
+$totalInstagram = $pdo->query("
 SELECT COUNT(*)
-FROM recruitment_interviews
+FROM social_instagram_posts
 ")->fetchColumn();
 
-$totalTraining = $pdo->query("
+$totalTwitter = $pdo->query("
 SELECT COUNT(*)
-FROM recruitment_training
+FROM social_twitter_posts
 ")->fetchColumn();
 
-$totalEmployees = $pdo->query("
+$totalCampaigns = $pdo->query("
 SELECT COUNT(*)
-FROM employees
+FROM social_campaigns
 ")->fetchColumn();
 
 include '../layout/header.php';
@@ -52,7 +46,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Recruitment Reports & Analytics
+Social Media Reports & Analytics
 
 </h3>
 
@@ -64,57 +58,9 @@ Recruitment Reports & Analytics
 
 <div class="card-body text-center">
 
-<h4><?= number_format($totalVacancies); ?></h4>
+<h4><?= number_format($totalFacebook); ?></h4>
 
-<p>Vacancies</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-2">
-
-<div class="card border-warning">
-
-<div class="card-body text-center">
-
-<h4><?= number_format($totalApplications); ?></h4>
-
-<p>Applications</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-2">
-
-<div class="card border-info">
-
-<div class="card-body text-center">
-
-<h4><?= number_format($totalInterviews); ?></h4>
-
-<p>Interviews</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-2">
-
-<div class="card border-success">
-
-<div class="card-body text-center">
-
-<h4><?= number_format($totalTraining); ?></h4>
-
-<p>Training</p>
+<p>Facebook Posts</p>
 
 </div>
 
@@ -128,9 +74,57 @@ Recruitment Reports & Analytics
 
 <div class="card-body text-center">
 
-<h4><?= number_format($totalEmployees); ?></h4>
+<h4><?= number_format($totalYoutube); ?></h4>
 
-<p>Joined</p>
+<p>YouTube Content</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-2">
+
+<div class="card border-warning">
+
+<div class="card-body text-center">
+
+<h4><?= number_format($totalInstagram); ?></h4>
+
+<p>Instagram Posts</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card border-dark">
+
+<div class="card-body text-center">
+
+<h4><?= number_format($totalTwitter); ?></h4>
+
+<p>X/Twitter Posts</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card border-success">
+
+<div class="card-body text-center">
+
+<h4><?= number_format($totalCampaigns); ?></h4>
+
+<p>Campaigns</p>
 
 </div>
 
@@ -144,7 +138,7 @@ Recruitment Reports & Analytics
 
 <div class="card-header bg-success text-white">
 
-Recruitment Summary
+Social Media Summary
 
 </div>
 
@@ -153,28 +147,28 @@ Recruitment Summary
 <table class="table table-bordered">
 
 <tr>
-<th>Total Vacancies</th>
-<td><?= number_format($totalVacancies); ?></td>
+<th>Facebook Posts</th>
+<td><?= number_format($totalFacebook); ?></td>
 </tr>
 
 <tr>
-<th>Total Applications</th>
-<td><?= number_format($totalApplications); ?></td>
+<th>YouTube Content</th>
+<td><?= number_format($totalYoutube); ?></td>
 </tr>
 
 <tr>
-<th>Total Interviews</th>
-<td><?= number_format($totalInterviews); ?></td>
+<th>Instagram Posts</th>
+<td><?= number_format($totalInstagram); ?></td>
 </tr>
 
 <tr>
-<th>Total Training Candidates</th>
-<td><?= number_format($totalTraining); ?></td>
+<th>X/Twitter Posts</th>
+<td><?= number_format($totalTwitter); ?></td>
 </tr>
 
 <tr>
-<th>Total Active Employees</th>
-<td><?= number_format($totalEmployees); ?></td>
+<th>Campaigns</th>
+<td><?= number_format($totalCampaigns); ?></td>
 </tr>
 
 </table>
@@ -195,45 +189,67 @@ Available Reports
 
 <div class="row">
 
-<div class="col-md-3 mb-2">
+<div class="col-md-2 mb-2">
 
-<a href="vacancy-report.php"
+<a href="facebook-report.php"
 class="btn btn-primary w-100">
 
-Vacancy Reports
+Facebook
 
 </a>
 
 </div>
 
-<div class="col-md-3 mb-2">
+<div class="col-md-2 mb-2">
 
-<a href="application-report.php"
-class="btn btn-warning w-100">
-
-Application Reports
-
-</a>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<a href="training-report.php"
-class="btn btn-success w-100">
-
-Training Reports
-
-</a>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<a href="joining-report.php"
+<a href="youtube-report.php"
 class="btn btn-danger w-100">
 
-Joining Reports
+YouTube
+
+</a>
+
+</div>
+
+<div class="col-md-2 mb-2">
+
+<a href="instagram-report.php"
+class="btn btn-warning w-100">
+
+Instagram
+
+</a>
+
+</div>
+
+<div class="col-md-2 mb-2">
+
+<a href="twitter-report.php"
+class="btn btn-dark w-100">
+
+X/Twitter
+
+</a>
+
+</div>
+
+<div class="col-md-2 mb-2">
+
+<a href="campaign-report.php"
+class="btn btn-success w-100">
+
+Campaigns
+
+</a>
+
+</div>
+
+<div class="col-md-2 mb-2">
+
+<a href="engagement-report.php"
+class="btn btn-info w-100">
+
+Engagement
 
 </a>
 
@@ -249,24 +265,22 @@ Joining Reports
 
 <div class="card-header bg-warning text-dark">
 
-Recruitment Reports Workflow
+Social Media Reports Workflow
 
 </div>
 
 <div class="card-body">
 
 <pre>
-Vacancies
+Posts Published
       ↓
-Applications
+Audience Reach
       ↓
-Interviews
+Engagement
       ↓
-Training
+Analytics
       ↓
-Joining
-      ↓
-Reports & Analytics
+Reports
 </pre>
 
 </div>
@@ -277,7 +291,7 @@ Reports & Analytics
 
 <div class="card-header bg-info text-white">
 
-Report Features
+Reports Features
 
 </div>
 
@@ -285,29 +299,29 @@ Report Features
 
 <ul>
 
-<li>Vacancy Reports</li>
+<li>Facebook Reports</li>
 
-<li>Application Reports</li>
+<li>YouTube Reports</li>
 
-<li>Interview Reports</li>
+<li>Instagram Reports</li>
 
-<li>Training Reports</li>
+<li>X/Twitter Reports</li>
 
-<li>Joining Reports</li>
+<li>Campaign Reports</li>
 
-<li>Reporter Recruitment Reports</li>
+<li>Reach Analytics</li>
 
-<li>District Wise Recruitment Reports</li>
+<li>Engagement Analytics</li>
 
-<li>Monthly Reports</li>
+<li>Follower Growth Reports</li>
 
-<li>Yearly Reports</li>
+<li>ROI Reports</li>
+
+<li>Monthly Analytics</li>
 
 <li>PDF Export</li>
 
 <li>Excel Export</li>
-
-<li>Analytics Dashboard</li>
 
 </ul>
 
