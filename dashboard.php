@@ -7,35 +7,33 @@ if(session_status()===PHP_SESSION_NONE)
     session_start();
 }
 
-if(!isset($_SESSION['admin_id']))
+if(
+!isset($_SESSION['admin_id'])
+||
+$_SESSION['role']!='super_admin'
+)
 {
-    header("Location: ../index.php");
-    exit;
+    die('Access Denied');
 }
 
-$totalFacebookPosts = $pdo->query("
+$totalAdmins = $pdo->query("
 SELECT COUNT(*)
-FROM social_facebook_posts
+FROM admins
 ")->fetchColumn();
 
-$totalYoutubePosts = $pdo->query("
+$totalEmployees = $pdo->query("
 SELECT COUNT(*)
-FROM social_youtube_posts
+FROM employees
 ")->fetchColumn();
 
-$totalInstagramPosts = $pdo->query("
+$totalNews = $pdo->query("
 SELECT COUNT(*)
-FROM social_instagram_posts
+FROM news
 ")->fetchColumn();
 
-$totalTwitterPosts = $pdo->query("
-SELECT COUNT(*)
-FROM social_twitter_posts
-")->fetchColumn();
-
-$totalCampaigns = $pdo->query("
-SELECT COUNT(*)
-FROM social_campaigns
+$totalRevenue = $pdo->query("
+SELECT IFNULL(SUM(total_amount),0)
+FROM advertisement_bookings
 ")->fetchColumn();
 
 include '../layout/header.php';
@@ -46,69 +44,21 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Social Media Command Center
+Super Admin Dashboard
 
 </h3>
 
 <div class="row">
 
-<div class="col-md-2">
+<div class="col-md-3">
 
 <div class="card border-primary">
 
 <div class="card-body text-center">
 
-<h4><?= $totalFacebookPosts; ?></h4>
+<h2><?= $totalAdmins; ?></h2>
 
-<p>Facebook</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-2">
-
-<div class="card border-danger">
-
-<div class="card-body text-center">
-
-<h4><?= $totalYoutubePosts; ?></h4>
-
-<p>YouTube</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-2">
-
-<div class="card border-warning">
-
-<div class="card-body text-center">
-
-<h4><?= $totalInstagramPosts; ?></h4>
-
-<p>Instagram</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-3">
-
-<div class="card border-dark">
-
-<div class="card-body text-center">
-
-<h4><?= $totalTwitterPosts; ?></h4>
-
-<p>X / Twitter</p>
+<p>Total Admins</p>
 
 </div>
 
@@ -122,9 +72,45 @@ Social Media Command Center
 
 <div class="card-body text-center">
 
-<h4><?= $totalCampaigns; ?></h4>
+<h2><?= $totalEmployees; ?></h2>
 
-<p>Campaigns</p>
+<p>Total Employees</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card border-warning">
+
+<div class="card-body text-center">
+
+<h2><?= $totalNews; ?></h2>
+
+<p>Total News</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card border-danger">
+
+<div class="card-body text-center">
+
+<h2>
+
+₹<?= number_format($totalRevenue); ?>
+
+</h2>
+
+<p>Total Revenue</p>
 
 </div>
 
@@ -136,9 +122,9 @@ Social Media Command Center
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-primary text-white">
+<div class="card-header bg-dark text-white">
 
-Social Media Control Panel
+Master Control Panel
 
 </div>
 
@@ -146,67 +132,49 @@ Social Media Control Panel
 
 <div class="row">
 
-<div class="col-md-2 mb-2">
+<div class="col-md-3 mb-2">
 
-<a href="facebook.php"
+<a
+href="roles.php"
 class="btn btn-primary w-100">
 
-Facebook
+Roles
 
 </a>
 
 </div>
 
-<div class="col-md-2 mb-2">
+<div class="col-md-3 mb-2">
 
-<a href="youtube.php"
-class="btn btn-danger w-100">
-
-YouTube
-
-</a>
-
-</div>
-
-<div class="col-md-2 mb-2">
-
-<a href="instagram.php"
-class="btn btn-warning w-100">
-
-Instagram
-
-</a>
-
-</div>
-
-<div class="col-md-2 mb-2">
-
-<a href="x-twitter.php"
-class="btn btn-dark w-100">
-
-X/Twitter
-
-</a>
-
-</div>
-
-<div class="col-md-2 mb-2">
-
-<a href="scheduler.php"
+<a
+href="permissions.php"
 class="btn btn-success w-100">
 
-Scheduler
+Permissions
 
 </a>
 
 </div>
 
-<div class="col-md-2 mb-2">
+<div class="col-md-3 mb-2">
 
-<a href="campaigns.php"
-class="btn btn-info w-100">
+<a
+href="admins.php"
+class="btn btn-warning w-100">
 
-Campaigns
+Admins
+
+</a>
+
+</div>
+
+<div class="col-md-3 mb-2">
+
+<a
+href="activity-logs.php"
+class="btn btn-danger w-100">
+
+Activity Logs
 
 </a>
 
@@ -222,68 +190,60 @@ Campaigns
 
 <div class="card-header bg-success text-white">
 
-Social Media Workflow
+System Status
 
 </div>
 
 <div class="card-body">
 
-<pre>
-News Published
-       ↓
-Auto Social Distribution
-       ↓
-Facebook
-Instagram
-YouTube
-X (Twitter)
-       ↓
-Audience Reach
-       ↓
-Analytics
-</pre>
+<table class="table table-bordered">
 
-</div>
+<tr>
+<th width="300">News Portal</th>
+<td>
+<span class="badge bg-success">
+Running
+</span>
+</td>
+</tr>
 
-</div>
+<tr>
+<th>Advertisement System</th>
+<td>
+<span class="badge bg-success">
+Running
+</span>
+</td>
+</tr>
 
-<div class="card shadow mt-4">
+<tr>
+<th>HRMS Integration</th>
+<td>
+<span class="badge bg-success">
+Connected
+</span>
+</td>
+</tr>
 
-<div class="card-header bg-info text-white">
+<tr>
+<th>Email Server</th>
+<td>
+<span class="badge bg-success">
+Active
+</span>
+</td>
+</tr>
 
-Features
+<tr>
+<th>API Gateway</th>
+<td>
+<span class="badge bg-success">
+Healthy
+</span>
+</td>
+</tr>
 
-</div>
-
-<div class="card-body">
-
-<ul>
-
-<li>Facebook Publishing</li>
-
-<li>YouTube Publishing</li>
-
-<li>Instagram Publishing</li>
-
-<li>X (Twitter) Publishing</li>
-
-<li>Post Scheduling</li>
-
-<li>Campaign Management</li>
-
-<li>Auto News Sharing</li>
-
-<li>Social Analytics</li>
-
-<li>Audience Engagement</li>
-
-<li>Hashtag Management</li>
-
-<li>Social Reports</li>
-
-<li>Multi Platform Posting</li>
-
-</ul>
+</table>
 
 </div>
 

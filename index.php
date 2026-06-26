@@ -4,11 +4,10 @@ require_once '../../includes/config.php';
 
 session_start();
 
-$list=$pdo->query("
-SELECT *
-FROM subscription_plans
-ORDER BY id DESC
-")->fetchAll();
+if(!isset($_SESSION['admin_id']))
+{
+exit;
+}
 
 include '../layout/header.php';
 
@@ -16,41 +15,93 @@ include '../layout/header.php';
 
 <div class="container-fluid">
 
+<div class="row">
+
+<div class="col-md-3 mb-3">
+
 <div class="card">
 
-<div class="card-header bg-danger text-white">
+<div class="card-body text-center">
 
-Subscription Plans
+<h5>User Rights</h5>
+
+<a
+href="../users/rights/index.php"
+class="btn btn-danger">
+
+Manage
+
+</a>
 
 </div>
 
-<div class="card-body">
+</div>
 
-<table class="table table-bordered">
+</div>
 
-<tr>
+<div class="col-md-3 mb-3">
 
-<th>Name</th>
-<th>Price</th>
-<th>Duration</th>
+<div class="card">
 
-</tr>
+<div class="card-body text-center">
 
-<?php foreach($list as $row): ?>
+<h5>Override Control</h5>
 
-<tr>
+<a
+href="override.php"
+class="btn btn-primary">
 
-<td><?= htmlspecialchars($row['plan_name']); ?></td>
+Open
 
-<td>₹<?= $row['price']; ?></td>
+</a>
 
-<td><?= $row['duration']; ?></td>
+</div>
 
-</tr>
+</div>
 
-<?php endforeach; ?>
+</div>
 
-</table>
+<div class="col-md-3 mb-3">
+
+<div class="card">
+
+<div class="card-body text-center">
+
+<h5>Approval Center</h5>
+
+<a
+href="../approval-center/index.php"
+class="btn btn-success">
+
+Open
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3 mb-3">
+
+<div class="card">
+
+<div class="card-body text-center">
+
+<h5>System Audit</h5>
+
+<a
+href="../audit/index.php"
+class="btn btn-dark">
+
+Open
+
+</a>
+
+</div>
+
+</div>
 
 </div>
 
