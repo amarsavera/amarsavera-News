@@ -1,66 +1,47 @@
 <?php
 
-require_once '../../../includes/config.php';
-require_once '../../includes/auth.php';
+require_once '../../includes/config.php';
 
-if(session_status()===PHP_SESSION_NONE)
-{
+if(session_status()===PHP_SESSION_NONE){
     session_start();
 }
 
-if(!isset($_SESSION['admin_id']))
-{
-    header("Location: /admin/index.php");
+if(!isset($_SESSION['admin_id'])){
+    header("Location: ../index.php");
     exit;
 }
-if($_SERVER['REQUEST_METHOD']=='POST')
-{
 
-$stmt=$pdo->prepare("
-INSERT INTO roles
-(
-role_name,
-status
-)
-VALUES
-(
-?,1
-)
-");
+$departments = $pdo->query("
+SELECT *
+FROM departments
+WHERE status='active'
+ORDER BY department_name
+")->fetchAll();
 
-$stmt->execute([
-$_POST['role_name']
-]);
+if($_SERVER['REQUEST_METHOD']=='POST'){
 
-header("Location:index.php");
-exit;
+    $stmt = $pdo->prepare("
+    INSERT INTO roles
+    (
+        role_name,
+        department_id
+    )
+    VALUES
+    (
+        ?,?
+    )
+    ");
 
+    $stmt->execute([
+
+        $_POST['role_name'],
+        $_POST['department_id']
+
+    ]);
+
+    header("Location:index.php");
+    exit;
 }
 
-include '../../layout/header.php';
-
+include '../layout/header.php';
 ?>
-
-<div class="container-fluid">
-
-<form method="POST">
-
-<input
-type="text"
-name="role_name"
-class="form-control mb-3"
-placeholder="Role Name"
-required>
-
-<button
-class="btn btn-danger">
-
-Create Role
-
-</button>
-
-</form>
-
-</div>
-
-<?php include '../../layout/footer.php'; ?>
