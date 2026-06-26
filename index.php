@@ -2,289 +2,118 @@
 
 require_once '../../includes/config.php';
 
-$message = '';
-
-if($_SERVER['REQUEST_METHOD'] === 'POST'){
-
-    foreach($_POST as $key => $value){
-
-        $stmt = $pdo->prepare("
-        UPDATE settings
-        SET setting_value=?
-        WHERE setting_key=?
-        ");
-
-        $stmt->execute([
-            trim($value),
-            $key
-        ]);
-    }
-
-    $message = "सेटिंग्स सफलतापूर्वक अपडेट की गईं";
+if(session_status()===PHP_SESSION_NONE){
+    session_start();
 }
 
-$settings = [];
+if(!isset($_SESSION['admin_id'])){
+    header("Location: ../index.php");
+    exit;
+}
 
-$stmt = $pdo->query("
+$states = $pdo->query("
 SELECT *
-FROM settings
-");
-
-while($row = $stmt->fetch()){
-
-    $settings[$row['setting_key']]
-    =
-    $row['setting_value'];
-
-}
+FROM states
+ORDER BY state_name ASC
+")->fetchAll();
 
 include '../layout/header.php';
-
 ?>
 
 <div class="container-fluid">
 
-<h3 class="mb-4">
-वेबसाइट सेटिंग्स
-</h3>
+<div class="d-flex justify-content-between mb-3">
 
-<?php if($message): ?>
+<h3>State Management</h3>
 
-<div class="alert alert-success">
-
-<?= $message; ?>
+<a href="create.php" class="btn btn-success">
+    <i class="fa fa-plus"></i> Add State
+</a>
 
 </div>
+
+<div class="card shadow-sm">
+
+<div class="card-body">
+
+<div class="table-responsive">
+
+<table class="table table-bordered table-hover">
+
+<thead class="table-dark">
+
+<tr>
+    <th>ID</th>
+    <th>State Name</th>
+    <th>State Code</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<?php foreach($states as $state): ?>
+
+<tr>
+
+<td><?= $state['id']; ?></td>
+
+<td><?= htmlspecialchars($state['state_name']); ?></td>
+
+<td><?= htmlspecialchars($state['state_code']); ?></td>
+
+<td>
+
+<?php if($state['status']=='active'): ?>
+
+<span class="badge bg-success">
+Active
+</span>
+
+<?php else: ?>
+
+<span class="badge bg-danger">
+Inactive
+</span>
 
 <?php endif; ?>
 
-<form method="post">
+</td>
 
-<div class="card mb-4">
+<td>
 
-<div class="card-header">
-सामान्य सेटिंग्स
-</div>
+<a href="edit.php?id=<?= $state['id']; ?>"
+class="btn btn-primary btn-sm">
 
-<div class="card-body">
+Edit
 
-<div class="mb-3">
+</a>
 
-<label>
-वेबसाइट नाम
-</label>
+<a href="delete.php?id=<?= $state['id']; ?>"
+class="btn btn-danger btn-sm"
+onclick="return confirm('Delete State?');">
 
-<input
-type="text"
-name="site_name"
-class="form-control"
-value="<?= $settings['site_name'] ?? ''; ?>"
->
+Delete
 
-</div>
+</a>
 
-<div class="mb-3">
+</td>
 
-<label>
-टैगलाइन
-</label>
+</tr>
 
-<input
-type="text"
-name="site_tagline"
-class="form-control"
-value="<?= $settings['site_tagline'] ?? ''; ?>"
->
+<?php endforeach; ?>
 
-</div>
+</tbody>
 
-<div class="mb-3">
-
-<label>
-वेबसाइट URL
-</label>
-
-<input
-type="text"
-name="site_url"
-class="form-control"
-value="<?= $settings['site_url'] ?? ''; ?>"
->
+</table>
 
 </div>
 
 </div>
 
 </div>
-
-<div class="card mb-4">
-
-<div class="card-header">
-संपर्क जानकारी
-</div>
-
-<div class="card-body">
-
-<div class="mb-3">
-
-<label>
-ईमेल
-</label>
-
-<input
-type="email"
-name="contact_email"
-class="form-control"
-value="<?= $settings['contact_email'] ?? ''; ?>"
->
-
-</div>
-
-<div class="mb-3">
-
-<label>
-मोबाइल
-</label>
-
-<input
-type="text"
-name="contact_mobile"
-class="form-control"
-value="<?= $settings['contact_mobile'] ?? ''; ?>"
->
-
-</div>
-
-</div>
-
-</div>
-
-<div class="card mb-4">
-
-<div class="card-header">
-सोशल मीडिया
-</div>
-
-<div class="card-body">
-
-<div class="mb-3">
-
-<label>
-Facebook URL
-</label>
-
-<input
-type="text"
-name="facebook_url"
-class="form-control"
-value="<?= $settings['facebook_url'] ?? ''; ?>"
->
-
-</div>
-
-<div class="mb-3">
-
-<label>
-YouTube URL
-</label>
-
-<input
-type="text"
-name="youtube_url"
-class="form-control"
-value="<?= $settings['youtube_url'] ?? ''; ?>"
->
-
-</div>
-
-<div class="mb-3">
-
-<label>
-Instagram URL
-</label>
-
-<input
-type="text"
-name="instagram_url"
-class="form-control"
-value="<?= $settings['instagram_url'] ?? ''; ?>"
->
-
-</div>
-
-</div>
-
-</div>
-
-<div class="card mb-4">
-
-<div class="card-header">
-विशेष सुविधाएँ
-</div>
-
-<div class="card-body">
-
-<div class="mb-3">
-
-<label>
-Breaking News
-</label>
-
-<select
-name="breaking_news"
-class="form-control">
-
-<option value="1"
-<?= (($settings['breaking_news'] ?? '1')=='1')?'selected':''; ?>>
-Enabled
-</option>
-
-<option value="0"
-<?= (($settings['breaking_news'] ?? '1')=='0')?'selected':''; ?>>
-Disabled
-</option>
-
-</select>
-
-</div>
-
-<div class="mb-3">
-
-<label>
-Live TV
-</label>
-
-<select
-name="live_tv"
-class="form-control">
-
-<option value="1"
-<?= (($settings['live_tv'] ?? '1')=='1')?'selected':''; ?>>
-Enabled
-</option>
-
-<option value="0"
-<?= (($settings['live_tv'] ?? '1')=='0')?'selected':''; ?>>
-Disabled
-</option>
-
-</select>
-
-</div>
-
-</div>
-
-</div>
-
-<button
-type="submit"
-class="btn btn-success">
-
-सेटिंग्स सेव करें
-
-</button>
-
-</form>
 
 </div>
 

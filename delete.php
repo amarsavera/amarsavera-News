@@ -14,11 +14,39 @@ if(!isset($_SESSION['admin_id'])){
 $id = (int)($_GET['id'] ?? 0);
 
 $stmt = $pdo->prepare("
-DELETE FROM roles
+UPDATE states
+SET status='inactive'
 WHERE id=?
 ");
 
 $stmt->execute([$id]);
+
+$log = $pdo->prepare("
+INSERT INTO activity_logs
+(
+user_type,
+user_id,
+module_name,
+action_name,
+record_id,
+remarks,
+ip_address
+)
+VALUES
+(
+?,?,?,?,?,?,?
+)
+");
+
+$log->execute([
+'admin',
+$_SESSION['admin_id'],
+'States',
+'Delete State',
+$id,
+'State Deactivated',
+$_SERVER['REMOTE_ADDR']
+]);
 
 header("Location:index.php");
 exit;

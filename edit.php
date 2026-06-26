@@ -13,42 +13,37 @@ if(!isset($_SESSION['admin_id'])){
 
 $id = (int)($_GET['id'] ?? 0);
 
-$departments = $pdo->query("
-SELECT *
-FROM departments
-WHERE status='active'
-ORDER BY department_name ASC
-")->fetchAll();
-
 $stmt = $pdo->prepare("
 SELECT *
-FROM roles
+FROM states
 WHERE id=?
 LIMIT 1
 ");
 
 $stmt->execute([$id]);
 
-$role = $stmt->fetch();
+$state = $stmt->fetch();
 
-if(!$role){
-    die('Role Not Found');
+if(!$state){
+    die('State Not Found');
 }
 
 if($_SERVER['REQUEST_METHOD']=='POST'){
 
-    $stmt = $pdo->prepare("
-    UPDATE roles
+    $update = $pdo->prepare("
+    UPDATE states
     SET
-    role_name=?,
-    department_id=?
+    state_name=?,
+    state_code=?,
+    status=?
     WHERE id=?
     ");
 
-    $stmt->execute([
+    $update->execute([
 
-        $_POST['role_name'],
-        $_POST['department_id'],
+        trim($_POST['state_name']),
+        trim($_POST['state_code']),
+        $_POST['status'],
         $id
 
     ]);
@@ -58,29 +53,81 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 }
 
 include '../layout/header.php';
-?><div class="container-fluid"><div class="card shadow-sm"><div class="card-header bg-primary text-white">Edit Role
+?>
 
-</div><div class="card-body"><form method="post"><div class="mb-3"><label>Role Name</label>
+<div class="container-fluid">
+
+<div class="card shadow-sm">
+
+<div class="card-header bg-primary text-white">
+Edit State
+</div>
+
+<div class="card-body">
+
+<form method="post">
+
+<div class="mb-3">
+
+<label>State Name</label>
 
 <input
 type="text"
-name="role_name"
-value="<?= htmlspecialchars($role['role_name']); ?>"
+name="state_name"
 class="form-control"
+value="<?= htmlspecialchars($state['state_name']); ?>"
 required>
 
-</div><div class="mb-3"><label>Department</label>
+</div>
+
+<div class="mb-3">
+
+<label>State Code</label>
+
+<input
+type="text"
+name="state_code"
+class="form-control"
+value="<?= htmlspecialchars($state['state_code']); ?>">
+
+</div>
+
+<div class="mb-3">
+
+<label>Status</label>
 
 <select
-name="department_id"
+name="status"
 class="form-control">
 
-<?php foreach($departments as $dept): ?><option
-value="<?= $dept['id']; ?>"
-<?= $role['department_id']==$dept['id']?'selected':''; ?>><?= htmlspecialchars($dept['department_name']); ?></option><?php endforeach; ?></select></div><button
+<option value="active"
+<?= $state['status']=='active'?'selected':''; ?>>
+Active
+</option>
+
+<option value="inactive"
+<?= $state['status']=='inactive'?'selected':''; ?>>
+Inactive
+</option>
+
+</select>
+
+</div>
+
+<button
 type="submit"
-class="btn btn-success">
+class="btn btn-primary">
 
-Update Role
+Update State
 
-</button></form></div></div></div><?php include '../layout/footer.php'; ?>
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+<?php include '../layout/footer.php'; ?>
