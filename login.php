@@ -2,148 +2,66 @@
 
 require_once '../includes/config.php';
 
-session_start();
+header('Content-Type: application/json');
 
-if(isset($_SESSION['user_id']))
+if($_SERVER['REQUEST_METHOD']!='POST')
 {
-    header("Location: dashboard.php");
+    echo json_encode([
+        'status'=>false,
+        'message'=>'Invalid Request'
+    ]);
     exit;
 }
 
-$error = '';
+$email = trim($_POST['email'] ?? '');
+$password = trim($_POST['password'] ?? '');
 
-if($_SERVER['REQUEST_METHOD'] === 'POST')
+if(empty($email) || empty($password))
 {
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
-
-    $stmt = $pdo->prepare("
-    SELECT *
-    FROM users
-    WHERE email=?
-    AND status='active'
-    LIMIT 1
-    ");
-
-    $stmt->execute([$email]);
-
-    $user = $stmt->fetch();
-
-    if(
-        $user &&
-        password_verify(
-            $password,
-            $user['password']
-        )
-    )
-    {
-        $_SESSION['user_id'] = $user['id'];
-
-        header("Location: dashboard.php");
-        exit;
-    }
-
-    $error = "Invalid Email or Password";
+    echo json_encode([
+        'status'=>false,
+        'message'=>'Email and Password Required'
+    ]);
+    exit;
 }
 
-?>
+$stmt = $pdo->prepare("
+SELECT *
+FROM users
+WHERE email=?
+LIMIT 1
+");
 
-<!DOCTYPE html>
-<html lang="en">
+$stmt->execute([$email]);
 
-<head>
+$user = $stmt->fetch();
 
-<meta charset="UTF-8">
+if(!$user)
+{
+    echo json_encode([
+        'status'=>false,
+        'message'=>'User Not Found'
+    ]);
+    exit;
+}
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1">
+if(!password_verify($password,$user['password']))
+{
+    echo json_encode([
+        'status'=>false,
+        'message'=>'Invalid Password'
+    ]);
+    exit;
+}
 
-<title>Admin Login - Amar Savera</title>
-
-<link
-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-rel="stylesheet">
-
-</head>
-
-<body class="bg-light">
-
-<div class="container">
-
-<div class="row justify-content-center">
-
-<div class="col-md-5 mt-5">
-
-<div class="card shadow">
-
-<div class="card-header bg-danger text-white text-center">
-
-<h4>
-
-Admin Login
-
-</h4>
-
-</div>
-
-<div class="card-body">
-
-<?php if($error): ?>
-
-<div class="alert alert-danger">
-
-<?= $error; ?>
-
-</div>
-
-<?php endif; ?>
-
-<form method="POST">
-
-<div class="mb-3">
-
-<label>Email</label>
-
-<input
-type="email"
-name="email"
-class="form-control"
-required>
-
-</div>
-
-<div class="mb-3">
-
-<label>Password</label>
-
-<input
-type="password"
-name="password"
-class="form-control"
-required>
-
-</div>
-
-<button
-type="submit"
-class="btn btn-danger w-100">
-
-Login
-
-</button>
-
-</form>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</body>
-
-</html>
+echo json_encode([
+    'status'=>true,
+    'message'=>'Login Successful',
+    'user'=>[
+        'id'=>$user['id'],
+        'name'=>$user['name'],
+        'email'=>$user['email'],
+        'mobile'=>$user['mobile'],
+        'role_id'=>$user['role_id']
+    ]
+]);

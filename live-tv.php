@@ -1,35 +1,32 @@
 <?php
 
-require_once 'includes/config.php';
+require_once '../includes/config.php';
 
-$live=$pdo->query("
+header('Content-Type: application/json');
+
+$stmt = $pdo->query("
 SELECT *
 FROM live_tv
-WHERE status=1
+ORDER BY id DESC
 LIMIT 1
-")->fetch();
+");
 
-include 'includes/header.php';
+$tv = $stmt->fetch();
 
-?>
+if(!$tv)
+{
+    echo json_encode([
+        'status'=>false,
+        'message'=>'No Live TV Found'
+    ]);
+    exit;
+}
 
-<div class="container mt-4">
-
-<h2 class="mb-3">
-
-Live TV
-
-</h2>
-
-<div class="ratio ratio-16x9">
-
-<iframe
-src="<?= htmlspecialchars($live['youtube_url'] ?? ''); ?>"
-allowfullscreen>
-</iframe>
-
-</div>
-
-</div>
-
-<?php include 'includes/footer.php'; ?>
+echo json_encode([
+    'status'=>true,
+    'data'=>[
+        'id'=>$tv['id'],
+        'title'=>$tv['title'],
+        'stream_url'=>$tv['stream_url']
+    ]
+]);
