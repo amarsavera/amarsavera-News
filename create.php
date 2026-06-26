@@ -1,29 +1,35 @@
 <?php
 
-require_once '../../includes/config.php';
+require_once '../../../includes/config.php';
+require_once '../../includes/auth.php';
 
-session_start();
+if(session_status()===PHP_SESSION_NONE)
+{
+    session_start();
+}
 
+if(!isset($_SESSION['admin_id']))
+{
+    header("Location: /admin/index.php");
+    exit;
+}
 if($_SERVER['REQUEST_METHOD']=='POST')
 {
 
 $stmt=$pdo->prepare("
-INSERT INTO advertisement_rate_cards
+INSERT INTO roles
 (
-title,
-price
+role_name,
+status
 )
 VALUES
 (
-?,?
+?,1
 )
 ");
 
 $stmt->execute([
-
-$_POST['title'],
-$_POST['price']
-
+$_POST['role_name']
 ]);
 
 header("Location:index.php");
@@ -31,31 +37,30 @@ exit;
 
 }
 
-include '../layout/header.php';
+include '../../layout/header.php';
 
 ?>
+
+<div class="container-fluid">
 
 <form method="POST">
 
 <input
 type="text"
-name="title"
+name="role_name"
 class="form-control mb-3"
-placeholder="Title">
-
-<input
-type="number"
-name="price"
-class="form-control mb-3"
-placeholder="Price">
+placeholder="Role Name"
+required>
 
 <button
 class="btn btn-danger">
 
-Save
+Create Role
 
 </button>
 
 </form>
 
-<?php include '../layout/footer.php'; ?>
+</div>
+
+<?php include '../../layout/footer.php'; ?>

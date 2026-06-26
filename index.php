@@ -1,16 +1,16 @@
 <?php
 
-require_once '../../includes/config.php';
+require_once '../../../includes/config.php';
 
 session_start();
 
 $list=$pdo->query("
 SELECT *
-FROM advertisement_rate_cards
+FROM roles
 ORDER BY id DESC
 ")->fetchAll();
 
-include '../layout/header.php';
+include '../../layout/header.php';
 
 ?>
 
@@ -20,7 +20,7 @@ include '../layout/header.php';
 
 <div class="card-header bg-danger text-white">
 
-Advertisement Rate Card
+Roles Management
 
 </div>
 
@@ -30,7 +30,7 @@ Advertisement Rate Card
 href="create.php"
 class="btn btn-danger mb-3">
 
-Add Rate
+Create Role
 
 </a>
 
@@ -38,8 +38,9 @@ Add Rate
 
 <tr>
 
-<th>Title</th>
-<th>Price</th>
+<th>ID</th>
+<th>Role Name</th>
+<th>Status</th>
 <th>Action</th>
 
 </tr>
@@ -48,17 +49,19 @@ Add Rate
 
 <tr>
 
-<td><?= htmlspecialchars($row['title']); ?></td>
+<td><?= $row['id']; ?></td>
 
-<td>₹<?= $row['price']; ?></td>
+<td><?= htmlspecialchars($row['role_name']); ?></td>
+
+<td><?= $row['status']; ?></td>
 
 <td>
 
 <a
-href="edit.php?id=<?= $row['id']; ?>"
-class="btn btn-warning btn-sm">
+href="permissions.php?id=<?= $row['id']; ?>"
+class="btn btn-primary btn-sm">
 
-Edit
+Permissions
 
 </a>
 
@@ -76,4 +79,4 @@ Edit
 
 </div>
 
-<?php include '../layout/footer.php'; ?>
+<?php include '../../layout/footer.php'; ?>
