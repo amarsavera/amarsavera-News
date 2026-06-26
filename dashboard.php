@@ -1,82 +1,55 @@
 <?php
 
-require_once '../../includes/config.php';
+require_once '../includes/config.php';
 
-if(session_status()===PHP_SESSION_NONE)
-{
-    session_start();
-}
+session_start();
 
-if(!isset($_SESSION['admin_id']))
+if(!isset($_SESSION['user_id']))
 {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit;
 }
 
-$totalChannels = $pdo->query("
-SELECT COUNT(*)
-FROM youtube_channels
-")->fetchColumn();
+$userId = (int)$_SESSION['user_id'];
 
-$totalVideos = $pdo->query("
-SELECT COUNT(*)
-FROM youtube_videos
-")->fetchColumn();
+$stmt = $pdo->prepare("
+SELECT *
+FROM users
+WHERE id=?
+LIMIT 1
+");
 
-$totalLiveStreams = $pdo->query("
-SELECT COUNT(*)
-FROM youtube_live_streams
-")->fetchColumn();
+$stmt->execute([$userId]);
 
-$totalSubscribers = $pdo->query("
-SELECT COUNT(*)
-FROM youtube_subscribers
-")->fetchColumn();
-
-$totalPlaylists = $pdo->query("
-SELECT COUNT(*)
-FROM youtube_playlists
-")->fetchColumn();
-
-include '../layout/header.php';
+$user = $stmt->fetch();
 
 ?>
 
-<div class="container-fluid">
+<?php include '../includes/header.php'; ?>
 
-<h3 class="mb-4">
-
-YouTube Command Center
-
-</h3>
+<div class="container-fluid mt-4">
 
 <div class="row">
 
-<div class="col-md-2">
+<div class="col-lg-3">
 
-<div class="card border-danger">
-
-<div class="card-body text-center">
-
-<h4><?= $totalChannels; ?></h4>
-
-<p>Channels</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-2">
-
-<div class="card border-primary">
+<div class="card shadow">
 
 <div class="card-body text-center">
 
-<h4><?= $totalVideos; ?></h4>
+<h4>
 
-<p>Videos</p>
+<?= htmlspecialchars($user['name']); ?>
+
+</h4>
+
+<hr>
+
+<p>
+
+<?= htmlspecialchars($user['email']); ?>
+
+</p>
 
 </div>
 
@@ -84,15 +57,26 @@ YouTube Command Center
 
 </div>
 
-<div class="col-md-3">
+<div class="col-lg-9">
 
-<div class="card border-success">
+<div class="row">
+
+<div class="col-md-3 mb-4">
+
+<div class="card shadow border-0">
 
 <div class="card-body text-center">
 
-<h4><?= $totalLiveStreams; ?></h4>
+<h2>
 
-<p>Live Streams</p>
+<?= $pdo->query("
+SELECT COUNT(*)
+FROM news
+")->fetchColumn(); ?>
+
+</h2>
+
+<p>Total News</p>
 
 </div>
 
@@ -100,15 +84,22 @@ YouTube Command Center
 
 </div>
 
-<div class="col-md-2">
+<div class="col-md-3 mb-4">
 
-<div class="card border-warning">
+<div class="card shadow border-0">
 
 <div class="card-body text-center">
 
-<h4><?= $totalSubscribers; ?></h4>
+<h2>
 
-<p>Subscribers</p>
+<?= $pdo->query("
+SELECT COUNT(*)
+FROM reporters
+")->fetchColumn(); ?>
+
+</h2>
+
+<p>Reporters</p>
 
 </div>
 
@@ -116,15 +107,45 @@ YouTube Command Center
 
 </div>
 
-<div class="col-md-3">
+<div class="col-md-3 mb-4">
 
-<div class="card border-info">
+<div class="card shadow border-0">
 
 <div class="card-body text-center">
 
-<h4><?= $totalPlaylists; ?></h4>
+<h2>
 
-<p>Playlists</p>
+<?= $pdo->query("
+SELECT COUNT(*)
+FROM advertisements
+")->fetchColumn(); ?>
+
+</h2>
+
+<p>Advertisements</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3 mb-4">
+
+<div class="card shadow border-0">
+
+<div class="card-body text-center">
+
+<h2>
+
+<?= $pdo->query("
+SELECT COUNT(*)
+FROM users
+")->fetchColumn(); ?>
+
+</h2>
+
+<p>Users</p>
 
 </div>
 
@@ -134,59 +155,17 @@ YouTube Command Center
 
 </div>
 
-<div class="card shadow mt-4">
+<div class="card shadow">
 
 <div class="card-header bg-danger text-white">
 
-YouTube Control Panel
+Admin Dashboard
 
 </div>
 
 <div class="card-body">
 
-<div class="row">
-
-<div class="col-md-3 mb-2">
-
-<a href="channels.php"
-class="btn btn-danger w-100">
-
-Channels
-
-</a>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<a href="videos.php"
-class="btn btn-primary w-100">
-
-Videos
-
-</a>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<a href="live-streams.php"
-class="btn btn-success w-100">
-
-Live Streams
-
-</a>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<a href="analytics.php"
-class="btn btn-warning w-100">
-
-Analytics
-
-</a>
+Welcome to Amar Savera Admin Panel
 
 </div>
 
@@ -196,76 +175,6 @@ Analytics
 
 </div>
 
-<div class="card shadow mt-4">
-
-<div class="card-header bg-success text-white">
-
-YouTube Workflow
-
 </div>
 
-<div class="card-body">
-
-<pre>
-News Coverage
-      ↓
-Video Production
-      ↓
-YouTube Upload
-      ↓
-Subscribers
-      ↓
-Revenue
-      ↓
-Analytics
-</pre>
-
-</div>
-
-</div>
-
-<div class="card shadow mt-4">
-
-<div class="card-header bg-info text-white">
-
-Features
-
-</div>
-
-<div class="card-body">
-
-<ul>
-
-<li>YouTube Channel Management</li>
-
-<li>Video Publishing</li>
-
-<li>Live Streaming</li>
-
-<li>Playlist Management</li>
-
-<li>Subscriber Tracking</li>
-
-<li>Monetization Tracking</li>
-
-<li>Watch Time Analytics</li>
-
-<li>Revenue Analytics</li>
-
-<li>SEO Optimization</li>
-
-<li>Thumbnail Management</li>
-
-<li>Content Scheduling</li>
-
-<li>Performance Reports</li>
-
-</ul>
-
-</div>
-
-</div>
-
-</div>
-
-<?php include '../layout/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>
