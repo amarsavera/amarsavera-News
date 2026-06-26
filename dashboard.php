@@ -4,41 +4,50 @@ require_once '../../includes/config.php';
 
 if(session_status()===PHP_SESSION_NONE)
 {
-session_start();
+    session_start();
 }
 
 if(!isset($_SESSION['admin_id']))
 {
-header("Location: ../index.php");
-exit;
+    header("Location: ../index.php");
+    exit;
 }
 
 /*
 |--------------------------------------------------------------------------
-| Advertisement Dashboard Stats
+| Recruitment Dashboard Statistics
 |--------------------------------------------------------------------------
 */
 
-$totalClients = $pdo->query("
+$totalVacancies = $pdo->query("
 SELECT COUNT(*)
-FROM advertisement_clients
+FROM recruitment_vacancies
 ")->fetchColumn();
 
-$totalBookings = $pdo->query("
+$totalApplications = $pdo->query("
 SELECT COUNT(*)
-FROM advertisement_bookings
+FROM recruitment_applications
 ")->fetchColumn();
 
-$totalRevenue = $pdo->query("
-SELECT IFNULL(SUM(total_amount),0)
-FROM advertisement_bookings
-WHERE status='approved'
+$totalInterviews = $pdo->query("
+SELECT COUNT(*)
+FROM recruitment_interviews
 ")->fetchColumn();
 
-$pendingAds = $pdo->query("
+$totalSelected = $pdo->query("
 SELECT COUNT(*)
-FROM advertisement_bookings
-WHERE status='pending'
+FROM recruitment_applications
+WHERE application_status='selected'
+")->fetchColumn();
+
+$totalTraining = $pdo->query("
+SELECT COUNT(*)
+FROM recruitment_training
+")->fetchColumn();
+
+$totalJoined = $pdo->query("
+SELECT COUNT(*)
+FROM employees
 ")->fetchColumn();
 
 include '../layout/header.php';
@@ -49,25 +58,21 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Advertisement Dashboard
+Recruitment Management Dashboard
 
 </h3>
 
 <div class="row">
 
-<div class="col-md-3">
+<div class="col-md-2">
 
 <div class="card border-primary">
 
 <div class="card-body text-center">
 
-<h4>
+<h4><?= number_format($totalVacancies); ?></h4>
 
-<?= $totalClients; ?>
-
-</h4>
-
-<p>Total Clients</p>
+<p>Vacancies</p>
 
 </div>
 
@@ -75,41 +80,15 @@ Advertisement Dashboard
 
 </div>
 
-<div class="col-md-3">
-
-<div class="card border-success">
-
-<div class="card-body text-center">
-
-<h4>
-
-<?= $totalBookings; ?>
-
-</h4>
-
-<p>Total Bookings</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-3">
+<div class="col-md-2">
 
 <div class="card border-warning">
 
 <div class="card-body text-center">
 
-<h4>
+<h4><?= number_format($totalApplications); ?></h4>
 
-₹<?= number_format(
-$totalRevenue
-); ?>
-
-</h4>
-
-<p>Total Revenue</p>
+<p>Applications</p>
 
 </div>
 
@@ -117,19 +96,63 @@ $totalRevenue
 
 </div>
 
-<div class="col-md-3">
+<div class="col-md-2">
+
+<div class="card border-info">
+
+<div class="card-body text-center">
+
+<h4><?= number_format($totalInterviews); ?></h4>
+
+<p>Interviews</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-2">
+
+<div class="card border-success">
+
+<div class="card-body text-center">
+
+<h4><?= number_format($totalSelected); ?></h4>
+
+<p>Selected</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-2">
+
+<div class="card border-dark">
+
+<div class="card-body text-center">
+
+<h4><?= number_format($totalTraining); ?></h4>
+
+<p>Training</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-2">
 
 <div class="card border-danger">
 
 <div class="card-body text-center">
 
-<h4>
+<h4><?= number_format($totalJoined); ?></h4>
 
-<?= $pendingAds; ?>
-
-</h4>
-
-<p>Pending Approval</p>
+<p>Joined</p>
 
 </div>
 
@@ -143,7 +166,7 @@ $totalRevenue
 
 <div class="card-header bg-primary text-white">
 
-Advertisement Control Center
+Recruitment Control Center
 
 </div>
 
@@ -152,27 +175,47 @@ Advertisement Control Center
 <div class="row">
 
 <div class="col-md-3 mb-2">
-<a href="clients.php" class="btn btn-success w-100">
-Clients
+
+<a href="vacancies.php"
+class="btn btn-primary w-100">
+
+Vacancies
+
 </a>
+
 </div>
 
 <div class="col-md-3 mb-2">
-<a href="bookings.php" class="btn btn-primary w-100">
-Bookings
+
+<a href="applications.php"
+class="btn btn-warning w-100">
+
+Applications
+
 </a>
+
 </div>
 
 <div class="col-md-3 mb-2">
-<a href="billing.php" class="btn btn-warning w-100">
-Billing
+
+<a href="interviews.php"
+class="btn btn-info w-100">
+
+Interviews
+
 </a>
+
 </div>
 
 <div class="col-md-3 mb-2">
-<a href="reports.php" class="btn btn-danger w-100">
-Reports
+
+<a href="joining.php"
+class="btn btn-success w-100">
+
+Joining
+
 </a>
+
 </div>
 
 </div>
@@ -185,27 +228,71 @@ Reports
 
 <div class="card-header bg-success text-white">
 
-Revenue Flow
+Recruitment Workflow
 
 </div>
 
 <div class="card-body">
 
 <pre>
-Client
-   ↓
-Booking
-   ↓
-Approval
-   ↓
-Invoice
-   ↓
-Payment
-   ↓
-Collection
-   ↓
-Finance Ledger
+Application Received
+         ↓
+Screening
+         ↓
+Interview
+         ↓
+Selection
+         ↓
+7 Days Training
+         ↓
+ID Card & Authority Letter
+         ↓
+Joining
+         ↓
+Active Reporter
 </pre>
+
+</div>
+
+</div>
+
+<div class="card shadow mt-4">
+
+<div class="card-header bg-info text-white">
+
+Recruitment Features
+
+</div>
+
+<div class="card-body">
+
+<ul>
+
+<li>Journalist Recruitment</li>
+
+<li>District Reporter Recruitment</li>
+
+<li>Bureau Chief Recruitment</li>
+
+<li>Photographer Recruitment</li>
+
+<li>Interview Scheduling</li>
+
+<li>Training Management</li>
+
+<li>ID Card Generation</li>
+
+<li>Authority Letter Generation</li>
+
+<li>Official Email Creation</li>
+
+<li>HRMS Integration</li>
+
+<li>Employee ID Generation</li>
+
+<li>Performance Tracking</li>
+
+</ul>
 
 </div>
 

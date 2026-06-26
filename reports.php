@@ -15,52 +15,34 @@ if(!isset($_SESSION['admin_id']))
 
 /*
 |--------------------------------------------------------------------------
-| Advertisement Reports Summary
+| Recruitment Reports Dashboard
 |--------------------------------------------------------------------------
 */
 
-$totalBookings = $pdo->query("
+$totalVacancies = $pdo->query("
 SELECT COUNT(*)
-FROM advertisement_bookings
+FROM recruitment_vacancies
 ")->fetchColumn();
 
-$totalRevenue = $pdo->query("
-SELECT IFNULL(SUM(total_amount),0)
-FROM advertisement_bookings
-WHERE status='approved'
-")->fetchColumn();
-
-$totalCollections = $pdo->query("
-SELECT IFNULL(SUM(amount),0)
-FROM finance_payments
-")->fetchColumn();
-
-$totalClients = $pdo->query("
+$totalApplications = $pdo->query("
 SELECT COUNT(*)
-FROM advertisement_clients
+FROM recruitment_applications
 ")->fetchColumn();
 
-$topClients = $pdo->query("
-SELECT
+$totalInterviews = $pdo->query("
+SELECT COUNT(*)
+FROM recruitment_interviews
+")->fetchColumn();
 
-c.company_name,
+$totalTraining = $pdo->query("
+SELECT COUNT(*)
+FROM recruitment_training
+")->fetchColumn();
 
-COUNT(b.id) as total_bookings,
-
-IFNULL(SUM(b.total_amount),0) as revenue
-
-FROM advertisement_clients c
-
-LEFT JOIN advertisement_bookings b
-ON b.client_id=c.id
-
-GROUP BY c.id
-
-ORDER BY revenue DESC
-
-LIMIT 10
-
-")->fetchAll();
+$totalEmployees = $pdo->query("
+SELECT COUNT(*)
+FROM employees
+")->fetchColumn();
 
 include '../layout/header.php';
 
@@ -70,43 +52,21 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Advertisement Reports & Analytics
+Recruitment Reports & Analytics
 
 </h3>
 
 <div class="row">
 
-<div class="col-md-3">
+<div class="col-md-2">
 
 <div class="card border-primary">
 
 <div class="card-body text-center">
 
-<h4><?= $totalBookings; ?></h4>
+<h4><?= number_format($totalVacancies); ?></h4>
 
-<p>Total Bookings</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-3">
-
-<div class="card border-success">
-
-<div class="card-body text-center">
-
-<h4>
-
-₹<?= number_format(
-$totalRevenue
-); ?>
-
-</h4>
-
-<p>Total Revenue</p>
+<p>Vacancies</p>
 
 </div>
 
@@ -114,21 +74,15 @@ $totalRevenue
 
 </div>
 
-<div class="col-md-3">
+<div class="col-md-2">
 
 <div class="card border-warning">
 
 <div class="card-body text-center">
 
-<h4>
+<h4><?= number_format($totalApplications); ?></h4>
 
-₹<?= number_format(
-$totalCollections
-); ?>
-
-</h4>
-
-<p>Total Collections</p>
+<p>Applications</p>
 
 </div>
 
@@ -136,19 +90,47 @@ $totalCollections
 
 </div>
 
-<div class="col-md-3">
+<div class="col-md-2">
 
 <div class="card border-info">
 
 <div class="card-body text-center">
 
-<h4>
+<h4><?= number_format($totalInterviews); ?></h4>
 
-<?= $totalClients; ?>
+<p>Interviews</p>
 
-</h4>
+</div>
 
-<p>Total Clients</p>
+</div>
+
+</div>
+
+<div class="col-md-2">
+
+<div class="card border-success">
+
+<div class="card-body text-center">
+
+<h4><?= number_format($totalTraining); ?></h4>
+
+<p>Training</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-2">
+
+<div class="card border-danger">
+
+<div class="card-body text-center">
+
+<h4><?= number_format($totalEmployees); ?></h4>
+
+<p>Joined</p>
 
 </div>
 
@@ -162,66 +144,40 @@ $totalCollections
 
 <div class="card-header bg-success text-white">
 
-Top Revenue Clients
+Recruitment Summary
 
 </div>
 
 <div class="card-body">
 
-<div class="table-responsive">
-
-<table class="table table-bordered table-hover">
-
-<thead class="table-dark">
+<table class="table table-bordered">
 
 <tr>
-
-<th>Client Name</th>
-<th>Total Bookings</th>
-<th>Total Revenue</th>
-
+<th>Total Vacancies</th>
+<td><?= number_format($totalVacancies); ?></td>
 </tr>
-
-</thead>
-
-<tbody>
-
-<?php foreach($topClients as $client): ?>
 
 <tr>
-
-<td>
-
-<?= htmlspecialchars(
-$client['company_name']
-); ?>
-
-</td>
-
-<td>
-
-<?= $client['total_bookings']; ?>
-
-</td>
-
-<td>
-
-₹<?= number_format(
-$client['revenue'],
-2
-); ?>
-
-</td>
-
+<th>Total Applications</th>
+<td><?= number_format($totalApplications); ?></td>
 </tr>
 
-<?php endforeach; ?>
+<tr>
+<th>Total Interviews</th>
+<td><?= number_format($totalInterviews); ?></td>
+</tr>
 
-</tbody>
+<tr>
+<th>Total Training Candidates</th>
+<td><?= number_format($totalTraining); ?></td>
+</tr>
+
+<tr>
+<th>Total Active Employees</th>
+<td><?= number_format($totalEmployees); ?></td>
+</tr>
 
 </table>
-
-</div>
 
 </div>
 
@@ -241,23 +197,10 @@ Available Reports
 
 <div class="col-md-3 mb-2">
 
-<a
-href="revenue-report.php"
-class="btn btn-success w-100">
-
-Revenue Report
-
-</a>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<a
-href="client-report.php"
+<a href="vacancy-report.php"
 class="btn btn-primary w-100">
 
-Client Report
+Vacancy Reports
 
 </a>
 
@@ -265,11 +208,10 @@ Client Report
 
 <div class="col-md-3 mb-2">
 
-<a
-href="collection-report.php"
+<a href="application-report.php"
 class="btn btn-warning w-100">
 
-Collection Report
+Application Reports
 
 </a>
 
@@ -277,11 +219,21 @@ Collection Report
 
 <div class="col-md-3 mb-2">
 
-<a
-href="commission-report.php"
+<a href="training-report.php"
+class="btn btn-success w-100">
+
+Training Reports
+
+</a>
+
+</div>
+
+<div class="col-md-3 mb-2">
+
+<a href="joining-report.php"
 class="btn btn-danger w-100">
 
-Commission Report
+Joining Reports
 
 </a>
 
@@ -297,26 +249,24 @@ Commission Report
 
 <div class="card-header bg-warning text-dark">
 
-Analytics Workflow
+Recruitment Reports Workflow
 
 </div>
 
 <div class="card-body">
 
 <pre>
-Advertisement Booking
-          ↓
-Revenue Tracking
-          ↓
-Collection Tracking
-          ↓
-Commission Tracking
-          ↓
-Client Analysis
-          ↓
-Performance Reports
-          ↓
-Management Dashboard
+Vacancies
+      ↓
+Applications
+      ↓
+Interviews
+      ↓
+Training
+      ↓
+Joining
+      ↓
+Reports & Analytics
 </pre>
 
 </div>
@@ -327,7 +277,7 @@ Management Dashboard
 
 <div class="card-header bg-info text-white">
 
-Export Options
+Report Features
 
 </div>
 
@@ -335,25 +285,29 @@ Export Options
 
 <ul>
 
-<li>PDF Reports</li>
+<li>Vacancy Reports</li>
+
+<li>Application Reports</li>
+
+<li>Interview Reports</li>
+
+<li>Training Reports</li>
+
+<li>Joining Reports</li>
+
+<li>Reporter Recruitment Reports</li>
+
+<li>District Wise Recruitment Reports</li>
+
+<li>Monthly Reports</li>
+
+<li>Yearly Reports</li>
+
+<li>PDF Export</li>
 
 <li>Excel Export</li>
 
-<li>Monthly Revenue Reports</li>
-
-<li>Quarterly Reports</li>
-
-<li>Annual Revenue Reports</li>
-
-<li>District Wise Revenue Analysis</li>
-
-<li>State Wise Revenue Analysis</li>
-
-<li>Executive Performance Reports</li>
-
-<li>Collection Efficiency Reports</li>
-
-<li>Commission Analysis Reports</li>
+<li>Analytics Dashboard</li>
 
 </ul>
 
