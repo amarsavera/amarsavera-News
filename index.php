@@ -1,180 +1,191 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors',1);
-
 require_once '../includes/config.php';
 
-if(session_status() === PHP_SESSION_NONE){
-    session_start();
-}
+$message = '';
 
-if(isset($_SESSION['admin_id'])){
-    header("Location: dashboard.php");
-    exit;
-}
+if($_SERVER['REQUEST_METHOD'] === 'POST')
+{
+    $name    = trim($_POST['name'] ?? '');
+    $email   = trim($_POST['email'] ?? '');
+    $mobile  = trim($_POST['mobile'] ?? '');
+    $subject = trim($_POST['subject'] ?? '');
+    $messageText = trim($_POST['message'] ?? '');
 
-$error = '';
+    if(
+        $name != '' &&
+        $subject != '' &&
+        $messageText != ''
+    )
+    {
+        try{
 
-if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $stmt = $pdo->prepare("
+            INSERT INTO contact_messages
+            (
+                name,
+                email,
+                mobile,
+                subject,
+                message,
+                created_at
+            )
+            VALUES
+            (
+                ?,?,?,?,?,
+                NOW()
+            )
+            ");
 
-    $email = trim($_POST['email'] ?? '');
-    $password = trim($_POST['password'] ?? '');
+            $stmt->execute([
+                $name,
+                $email,
+                $mobile,
+                $subject,
+                $messageText
+            ]);
 
-    if(empty($email) || empty($password)){
+            $message =
+            '<div class="alert alert-success">
+            आपका संदेश सफलतापूर्वक भेज दिया गया है।
+            </div>';
 
-        $error = "ईमेल और पासवर्ड दर्ज करें";
+        }catch(Exception $e){
 
-    }else{
-
-        $stmt = $pdo->prepare("
-            SELECT *
-            FROM users
-            WHERE email = ?
-            AND status = 'active'
-            LIMIT 1
-        ");
-
-        $stmt->execute([$email]);
-
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if($user){
-
-    if($password === $user['password']){
-
-        $_SESSION['admin_id'] = $user['id'];
-        $_SESSION['admin_name'] = $user['name'];
-        $_SESSION['role_id'] = $user['role_id'];
-
-        header("Location: dashboard.php");
-        exit;
-
-    }else{
-
-        $error = "गलत पासवर्ड";
-
+            $message =
+            '<div class="alert alert-danger">
+            संदेश भेजने में समस्या हुई।
+            </div>';
+        }
     }
-
-}else{
-
-    $error = "यूजर नहीं मिला";
-
 }
 
-    }
-
-}
-
+include '../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="hi">
-<head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<div class="container mt-4">
 
-<title>Admin Login - Amar Savera</title>
+<div class="row">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<div class="col-lg-8">
 
-<style>
+<div class="card shadow-sm">
 
-body{
-    margin:0;
-    padding:0;
-    background:#f4f4f4;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    font-family:'Nirmala UI',sans-serif;
-}
-
-.login-box{
-    width:100%;
-    max-width:450px;
-    background:#fff;
-    padding:30px;
-    border-radius:10px;
-    box-shadow:0 0 20px rgba(0,0,0,.15);
-}
-
-.logo{
-    text-align:center;
-    font-size:40px;
-    font-weight:800;
-    color:#d50000;
-}
-
-.tagline{
-    text-align:center;
-    margin-bottom:25px;
-    color:#555;
-}
-
-.btn-login{
-    background:#d50000;
-    color:#fff;
-    border:none;
-}
-
-.btn-login:hover{
-    background:#b30000;
-    color:#fff;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="login-box">
-
-<div class="logo">
-अमर सवेरा
+<div class="card-header bg-danger text-white">
+<h4 class="mb-0">संपर्क करें</h4>
 </div>
 
-<div class="tagline">
-सत्य के साथ, जनता की आवाज
-</div>
+<div class="card-body">
 
-<?php if(!empty($error)): ?>
-<div class="alert alert-danger">
-<?= htmlspecialchars($error); ?>
-</div>
-<?php endif; ?>
+<?= $message; ?>
 
 <form method="post">
 
 <div class="mb-3">
-<label class="form-label">ईमेल</label>
+<label>नाम</label>
 <input
-type="email"
-name="email"
+type="text"
+name="name"
 class="form-control"
 required>
 </div>
 
 <div class="mb-3">
-<label class="form-label">पासवर्ड</label>
+<label>ईमेल</label>
 <input
-type="password"
-name="password"
+type="email"
+name="email"
+class="form-control">
+</div>
+
+<div class="mb-3">
+<label>मोबाइल नंबर</label>
+<input
+type="text"
+name="mobile"
+class="form-control">
+</div>
+
+<div class="mb-3">
+<label>विषय</label>
+<input
+type="text"
+name="subject"
 class="form-control"
 required>
 </div>
 
+<div class="mb-3">
+<label>संदेश</label>
+<textarea
+name="message"
+rows="6"
+class="form-control"
+required></textarea>
+</div>
+
 <button
 type="submit"
-class="btn btn-login w-100">
-लॉगिन करें
+class="btn btn-danger">
+
+संदेश भेजें
+
 </button>
 
 </form>
 
 </div>
 
-</body>
-</html>
+</div>
+
+</div>
+
+<div class="col-lg-4">
+
+<div class="card shadow-sm">
+
+<div class="card-header bg-dark text-white">
+कार्यालय जानकारी
+</div>
+
+<div class="card-body">
+
+<p>
+<strong><?= SITE_NAME; ?></strong>
+</p>
+
+<p>
+<?= SITE_TAGLINE; ?>
+</p>
+
+<p>
+वेबसाइट:
+<br>
+<a href="<?= SITE_URL; ?>">
+<?= SITE_URL; ?>
+</a>
+</p>
+
+<p>
+ईमेल:
+<br>
+info@amarsavera.in
+</p>
+
+<p>
+मोबाइल:
+<br>
++91 7252039902
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<?php include '../includes/footer.php'; ?>
