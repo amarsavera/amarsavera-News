@@ -1,129 +1,155 @@
 <?php
 
-require_once '../../includes/config.php';
+require_once '../includes/config.php';
 
-if(session_status()===PHP_SESSION_NONE){
-    session_start();
-}
+$id = $_GET['id'] ?? 0;
 
-if(!isset($_SESSION['admin_id'])){
-    header("Location: ../index.php");
-    exit;
-}
+$title='';
+$link='';
+$position='header';
 
-$id = (int)($_GET['id'] ?? 0);
-
-$stmt = $pdo->prepare("
-SELECT *
-FROM users
-WHERE id=?
-LIMIT 1
-");
-
-$stmt->execute([$id]);
-
-$user = $stmt->fetch();
-
-if(!$user){
-    die('User Not Found');
-}
-
-$departments = $pdo->query("
-SELECT id,department_name
-FROM departments
-WHERE status='active'
-ORDER BY department_name ASC
-")->fetchAll();
-
-$roles = $pdo->query("
-SELECT id,role_name
-FROM roles
-ORDER BY role_name ASC
-")->fetchAll();
-
-$designations = $pdo->query("
-SELECT id,designation_name
-FROM designations
-WHERE status='active'
-ORDER BY designation_name ASC
-")->fetchAll();
-
-$languages = $pdo->query("
-SELECT language_code,language_name
-FROM languages
-WHERE status=1
-ORDER BY language_name ASC
-")->fetchAll();
-
-if($_SERVER['REQUEST_METHOD']=='POST'){
-
-    $sql = "
-    UPDATE users SET
-
-    name=?,
-    mobile=?,
-    email=?,
-    role_id=?,
-    department_id=?,
-    designation_id=?,
-    preferred_language=?,
-    status=?
-
+if($id)
+{
+    $stmt=$pdo->prepare("
+    SELECT *
+    FROM advertisements
     WHERE id=?
-    ";
+    ");
 
-    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$id]);
 
-    $stmt->execute([
+    $row=$stmt->fetch();
 
-        $_POST['name'],
-        $_POST['mobile'],
-        $_POST['email'],
-        $_POST['role_id'],
-        $_POST['department_id'],
-        $_POST['designation_id'],
-        $_POST['preferred_language'],
-        $_POST['status'],
-        $id
+    if($row)
+    {
+        $title=$row['title'];
+        $link=$row['link'];
+        $position=$row['position'];
+    }
+}
 
-    ]);
+if(isset($_POST['save']))
+{
+    $title=$_POST['title'];
+    $link=$_POST['link'];
+    $position=$_POST['position'];
 
-    header('Location:view.php?id='.$id);
+    $image='';
+
+    if(!empty($_FILES['image']['name']))
+    {
+        $filename=
+        time().'_'.
+        $_FILES['image']['name'];
+
+        move_uploaded_file(
+            $_FILES['image']['tmp_name'],
+            '../assets/uploads/ads/'.$filename
+        );
+
+        $image=
+        'assets/uploads/ads/'.$filename;
+    }
+
+    if($id)
+    {
+        $stmt=$pdo->prepare("
+        UPDATE advertisements
+        SET
+        title=?,
+        link=?,
+        position=?
+        WHERE id=?
+        ");
+
+        $stmt->execute([
+            $title,
+            $link,
+            $position,
+            $id
+        ]);
+    }
+    else
+    {
+        $stmt=$pdo->prepare("
+        INSERT INTO advertisements
+        (
+            title,
+            image,
+            link,
+            position
+        )
+        VALUES
+        (
+            ?,?,?,?
+        )
+        ");
+
+        $stmt->execute([
+            $title,
+            $image,
+            $link,
+            $position
+        ]);
+    }
+
+    header("Location:index.php");
     exit;
 }
 
-include '../layout/header.php';
-?><div class="container-fluid"><div class="card shadow-sm"><div class="card-header bg-primary text-white">Edit User
+?>
 
-</div><div class="card-body"><form method="post"><div class="row"><div class="col-md-6 mb-3">
-<label>Name</label>
-<input type="text"
-name="name"
-value="<?= htmlspecialchars($user['name']); ?>"
-class="form-control"
+<form
+method="post"
+enctype="multipart/form-data">
+
+<input
+type="text"
+name="title"
+placeholder="Title"
+value="<?= htmlspecialchars($title); ?>"
 required>
-</div><div class="col-md-6 mb-3">
-<label>Mobile</label>
-<input type="text"
-name="mobile"
-value="<?= htmlspecialchars($user['mobile']); ?>"
-class="form-control">
-</div><div class="col-md-6 mb-3">
-<label>Email</label>
-<input type="email"
-name="email"
-value="<?= htmlspecialchars($user['email']); ?>"
-class="form-control">
-</div><div class="col-md-6 mb-3">
-<label>Department</label><select name="department_id"
-class="form-control">
 
-<?php foreach($departments as $d): ?><option
-value="<?= $d['id']; ?>"
-<?= $user['department_id']==$d['id']?'selected':''; ?>><?= htmlspecialchars($d['department_name']); ?></option><?php endforeach; ?></select></div></div><button
+<br><br>
+
+<input
+type="text"
+name="link"
+placeholder="URL"
+value="<?= htmlspecialchars($link); ?>">
+
+<br><br>
+
+<select name="position">
+
+<option value="header">
+Header
+</option>
+
+<option value="sidebar">
+Sidebar
+</option>
+
+<option value="footer">
+Footer
+</option>
+
+</select>
+
+<br><br>
+
+<input
+type="file"
+name="image">
+
+<br><br>
+
+<button
 type="submit"
-class="btn btn-success">
+name="save">
 
-Update User
+Save
 
-</button></form></div></div></div><?php include '../layout/footer.php'; ?>
+</button>
+
+</form>

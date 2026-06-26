@@ -1,49 +1,86 @@
 <?php
 
-require_once '../../includes/config.php';
-require_once '../includes/auth.php';
+require_once '../includes/config.php';
 
-if(session_status()===PHP_SESSION_NONE)
-{
-    session_start();
-}
-
-if(!isset($_SESSION['admin_id']))
-{
-    header("Location: /admin/index.php");
-    exit;
-}
-$list=$pdo->query("
+$ads = $pdo->query("
 SELECT *
-FROM wallet_transactions
+FROM advertisements
 ORDER BY id DESC
 ")->fetchAll();
 
-include '../layout/header.php';
-
 ?>
 
-<div class="container-fluid">
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Advertisements</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container mt-4">
+
+<h3>Advertisement Management</h3>
+
+<a href="edit.php" class="btn btn-success mb-3">
+Add Advertisement
+</a>
 
 <table class="table table-bordered">
 
 <tr>
-
 <th>ID</th>
-<th>User</th>
-<th>Amount</th>
-<th>Type</th>
-
+<th>Image</th>
+<th>Title</th>
+<th>Position</th>
+<th>Action</th>
 </tr>
 
-<?php foreach($list as $row): ?>
+<?php foreach($ads as $ad): ?>
 
 <tr>
 
-<td><?= $row['id']; ?></td>
-<td><?= $row['user_id']; ?></td>
-<td><?= $row['amount']; ?></td>
-<td><?= $row['transaction_type']; ?></td>
+<td><?= $ad['id']; ?></td>
+
+<td>
+
+<?php if(!empty($ad['image'])): ?>
+
+<img
+src="../<?= $ad['image']; ?>"
+width="120">
+
+<?php endif; ?>
+
+</td>
+
+<td><?= htmlspecialchars($ad['title']); ?></td>
+
+<td><?= htmlspecialchars($ad['position']); ?></td>
+
+<td>
+
+<a
+href="edit.php?id=<?= $ad['id']; ?>"
+class="btn btn-primary btn-sm">
+
+Edit
+
+</a>
+
+<a
+href="delete.php?id=<?= $ad['id']; ?>"
+class="btn btn-danger btn-sm"
+onclick="return confirm('Delete?')">
+
+Delete
+
+</a>
+
+</td>
 
 </tr>
 
@@ -53,4 +90,5 @@ include '../layout/header.php';
 
 </div>
 
-<?php include '../layout/footer.php'; ?>
+</body>
+</html>
