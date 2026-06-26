@@ -13,29 +13,34 @@ if(!isset($_SESSION['admin_id']))
     exit;
 }
 
-$totalFacebook = $pdo->query("
+$totalChannels = $pdo->query("
 SELECT COUNT(*)
-FROM social_facebook_posts
+FROM telegram_channels
 ")->fetchColumn();
 
-$totalYoutube = $pdo->query("
+$totalGroups = $pdo->query("
 SELECT COUNT(*)
-FROM social_youtube_posts
+FROM telegram_groups
 ")->fetchColumn();
 
-$totalInstagram = $pdo->query("
+$totalSubscribers = $pdo->query("
 SELECT COUNT(*)
-FROM social_instagram_posts
+FROM telegram_subscribers
 ")->fetchColumn();
 
-$totalTwitter = $pdo->query("
+$totalBroadcasts = $pdo->query("
 SELECT COUNT(*)
-FROM social_twitter_posts
+FROM telegram_broadcasts
 ")->fetchColumn();
 
 $totalCampaigns = $pdo->query("
 SELECT COUNT(*)
-FROM social_campaigns
+FROM telegram_campaigns
+")->fetchColumn();
+
+$totalAutomations = $pdo->query("
+SELECT COUNT(*)
+FROM telegram_automation
 ")->fetchColumn();
 
 include '../layout/header.php';
@@ -46,7 +51,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Social Media Reports & Analytics
+Telegram Reports & Analytics
 
 </h3>
 
@@ -58,9 +63,9 @@ Social Media Reports & Analytics
 
 <div class="card-body text-center">
 
-<h4><?= number_format($totalFacebook); ?></h4>
+<h4><?= number_format($totalChannels); ?></h4>
 
-<p>Facebook Posts</p>
+<p>Channels</p>
 
 </div>
 
@@ -70,13 +75,13 @@ Social Media Reports & Analytics
 
 <div class="col-md-2">
 
-<div class="card border-danger">
+<div class="card border-success">
 
 <div class="card-body text-center">
 
-<h4><?= number_format($totalYoutube); ?></h4>
+<h4><?= number_format($totalGroups); ?></h4>
 
-<p>YouTube Content</p>
+<p>Groups</p>
 
 </div>
 
@@ -90,35 +95,35 @@ Social Media Reports & Analytics
 
 <div class="card-body text-center">
 
-<h4><?= number_format($totalInstagram); ?></h4>
+<h4><?= number_format($totalSubscribers); ?></h4>
 
-<p>Instagram Posts</p>
-
-</div>
+<p>Subscribers</p>
 
 </div>
 
 </div>
 
-<div class="col-md-3">
+</div>
 
-<div class="card border-dark">
+<div class="col-md-2">
+
+<div class="card border-danger">
 
 <div class="card-body text-center">
 
-<h4><?= number_format($totalTwitter); ?></h4>
+<h4><?= number_format($totalBroadcasts); ?></h4>
 
-<p>X/Twitter Posts</p>
-
-</div>
+<p>Broadcasts</p>
 
 </div>
 
 </div>
 
-<div class="col-md-3">
+</div>
 
-<div class="card border-success">
+<div class="col-md-2">
+
+<div class="card border-info">
 
 <div class="card-body text-center">
 
@@ -132,13 +137,29 @@ Social Media Reports & Analytics
 
 </div>
 
+<div class="col-md-2">
+
+<div class="card border-dark">
+
+<div class="card-body text-center">
+
+<h4><?= number_format($totalAutomations); ?></h4>
+
+<p>Automation</p>
+
+</div>
+
+</div>
+
+</div>
+
 </div>
 
 <div class="card shadow mt-4">
 
 <div class="card-header bg-success text-white">
 
-Social Media Summary
+Telegram Summary Report
 
 </div>
 
@@ -147,28 +168,33 @@ Social Media Summary
 <table class="table table-bordered">
 
 <tr>
-<th>Facebook Posts</th>
-<td><?= number_format($totalFacebook); ?></td>
+<th>Total Channels</th>
+<td><?= number_format($totalChannels); ?></td>
 </tr>
 
 <tr>
-<th>YouTube Content</th>
-<td><?= number_format($totalYoutube); ?></td>
+<th>Total Groups</th>
+<td><?= number_format($totalGroups); ?></td>
 </tr>
 
 <tr>
-<th>Instagram Posts</th>
-<td><?= number_format($totalInstagram); ?></td>
+<th>Total Subscribers</th>
+<td><?= number_format($totalSubscribers); ?></td>
 </tr>
 
 <tr>
-<th>X/Twitter Posts</th>
-<td><?= number_format($totalTwitter); ?></td>
+<th>Total Broadcasts</th>
+<td><?= number_format($totalBroadcasts); ?></td>
 </tr>
 
 <tr>
-<th>Campaigns</th>
+<th>Total Campaigns</th>
 <td><?= number_format($totalCampaigns); ?></td>
+</tr>
+
+<tr>
+<th>Total Automations</th>
+<td><?= number_format($totalAutomations); ?></td>
 </tr>
 
 </table>
@@ -191,10 +217,10 @@ Available Reports
 
 <div class="col-md-2 mb-2">
 
-<a href="facebook-report.php"
+<a href="channel-report.php"
 class="btn btn-primary w-100">
 
-Facebook
+Channels
 
 </a>
 
@@ -202,10 +228,10 @@ Facebook
 
 <div class="col-md-2 mb-2">
 
-<a href="youtube-report.php"
-class="btn btn-danger w-100">
+<a href="group-report.php"
+class="btn btn-success w-100">
 
-YouTube
+Groups
 
 </a>
 
@@ -213,10 +239,10 @@ YouTube
 
 <div class="col-md-2 mb-2">
 
-<a href="instagram-report.php"
+<a href="subscriber-report.php"
 class="btn btn-warning w-100">
 
-Instagram
+Subscribers
 
 </a>
 
@@ -224,10 +250,10 @@ Instagram
 
 <div class="col-md-2 mb-2">
 
-<a href="twitter-report.php"
-class="btn btn-dark w-100">
+<a href="broadcast-report.php"
+class="btn btn-danger w-100">
 
-X/Twitter
+Broadcasts
 
 </a>
 
@@ -236,7 +262,7 @@ X/Twitter
 <div class="col-md-2 mb-2">
 
 <a href="campaign-report.php"
-class="btn btn-success w-100">
+class="btn btn-info w-100">
 
 Campaigns
 
@@ -246,10 +272,10 @@ Campaigns
 
 <div class="col-md-2 mb-2">
 
-<a href="engagement-report.php"
-class="btn btn-info w-100">
+<a href="automation-report.php"
+class="btn btn-dark w-100">
 
-Engagement
+Automation
 
 </a>
 
@@ -265,21 +291,21 @@ Engagement
 
 <div class="card-header bg-warning text-dark">
 
-Social Media Reports Workflow
+Telegram Reports Workflow
 
 </div>
 
 <div class="card-body">
 
 <pre>
-Posts Published
-      ↓
+News Distribution
+        ↓
 Audience Reach
-      ↓
+        ↓
 Engagement
-      ↓
-Analytics
-      ↓
+        ↓
+Traffic Analytics
+        ↓
 Reports
 </pre>
 
@@ -299,25 +325,25 @@ Reports Features
 
 <ul>
 
-<li>Facebook Reports</li>
+<li>Channel Reports</li>
 
-<li>YouTube Reports</li>
+<li>Group Reports</li>
 
-<li>Instagram Reports</li>
+<li>Subscriber Reports</li>
 
-<li>X/Twitter Reports</li>
+<li>Broadcast Reports</li>
 
 <li>Campaign Reports</li>
 
+<li>Automation Reports</li>
+
 <li>Reach Analytics</li>
 
-<li>Engagement Analytics</li>
+<li>Traffic Analytics</li>
 
-<li>Follower Growth Reports</li>
+<li>Growth Reports</li>
 
-<li>ROI Reports</li>
-
-<li>Monthly Analytics</li>
+<li>Engagement Reports</li>
 
 <li>PDF Export</li>
 

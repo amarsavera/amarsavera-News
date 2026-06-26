@@ -7,33 +7,35 @@ if(session_status()===PHP_SESSION_NONE)
     session_start();
 }
 
-if(
-!isset($_SESSION['admin_id'])
-||
-$_SESSION['role']!='super_admin'
-)
+if(!isset($_SESSION['admin_id']))
 {
-    die('Access Denied');
+    header("Location: ../index.php");
+    exit;
 }
 
-$totalAdmins = $pdo->query("
+$totalChannels = $pdo->query("
 SELECT COUNT(*)
-FROM admins
+FROM telegram_channels
 ")->fetchColumn();
 
-$totalEmployees = $pdo->query("
+$totalGroups = $pdo->query("
 SELECT COUNT(*)
-FROM employees
+FROM telegram_groups
 ")->fetchColumn();
 
-$totalNews = $pdo->query("
+$totalSubscribers = $pdo->query("
 SELECT COUNT(*)
-FROM news
+FROM telegram_subscribers
 ")->fetchColumn();
 
-$totalRevenue = $pdo->query("
-SELECT IFNULL(SUM(total_amount),0)
-FROM advertisement_bookings
+$totalBroadcasts = $pdo->query("
+SELECT COUNT(*)
+FROM telegram_broadcasts
+")->fetchColumn();
+
+$totalCampaigns = $pdo->query("
+SELECT COUNT(*)
+FROM telegram_campaigns
 ")->fetchColumn();
 
 include '../layout/header.php';
@@ -44,37 +46,37 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Super Admin Dashboard
+Telegram Command Center
 
 </h3>
 
 <div class="row">
 
-<div class="col-md-3">
+<div class="col-md-2">
 
 <div class="card border-primary">
 
 <div class="card-body text-center">
 
-<h2><?= $totalAdmins; ?></h2>
+<h4><?= $totalChannels; ?></h4>
 
-<p>Total Admins</p>
-
-</div>
+<p>Channels</p>
 
 </div>
 
 </div>
 
-<div class="col-md-3">
+</div>
+
+<div class="col-md-2">
 
 <div class="card border-success">
 
 <div class="card-body text-center">
 
-<h2><?= $totalEmployees; ?></h2>
+<h4><?= $totalGroups; ?></h4>
 
-<p>Total Employees</p>
+<p>Groups</p>
 
 </div>
 
@@ -88,9 +90,25 @@ Super Admin Dashboard
 
 <div class="card-body text-center">
 
-<h2><?= $totalNews; ?></h2>
+<h4><?= $totalSubscribers; ?></h4>
 
-<p>Total News</p>
+<p>Subscribers</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-2">
+
+<div class="card border-danger">
+
+<div class="card-body text-center">
+
+<h4><?= $totalBroadcasts; ?></h4>
+
+<p>Broadcasts</p>
 
 </div>
 
@@ -100,17 +118,13 @@ Super Admin Dashboard
 
 <div class="col-md-3">
 
-<div class="card border-danger">
+<div class="card border-info">
 
 <div class="card-body text-center">
 
-<h2>
+<h4><?= $totalCampaigns; ?></h4>
 
-₹<?= number_format($totalRevenue); ?>
-
-</h2>
-
-<p>Total Revenue</p>
+<p>Campaigns</p>
 
 </div>
 
@@ -122,9 +136,9 @@ Super Admin Dashboard
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-dark text-white">
+<div class="card-header bg-primary text-white">
 
-Master Control Panel
+Telegram Control Panel
 
 </div>
 
@@ -134,11 +148,10 @@ Master Control Panel
 
 <div class="col-md-3 mb-2">
 
-<a
-href="roles.php"
+<a href="channels.php"
 class="btn btn-primary w-100">
 
-Roles
+Channels
 
 </a>
 
@@ -146,11 +159,10 @@ Roles
 
 <div class="col-md-3 mb-2">
 
-<a
-href="permissions.php"
+<a href="groups.php"
 class="btn btn-success w-100">
 
-Permissions
+Groups
 
 </a>
 
@@ -158,23 +170,21 @@ Permissions
 
 <div class="col-md-3 mb-2">
 
-<a
-href="admins.php"
-class="btn btn-warning w-100">
-
-Admins
-
-</a>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<a
-href="activity-logs.php"
+<a href="broadcasts.php"
 class="btn btn-danger w-100">
 
-Activity Logs
+Broadcasts
+
+</a>
+
+</div>
+
+<div class="col-md-3 mb-2">
+
+<a href="subscribers.php"
+class="btn btn-warning w-100">
+
+Subscribers
 
 </a>
 
@@ -190,60 +200,67 @@ Activity Logs
 
 <div class="card-header bg-success text-white">
 
-System Status
+Telegram Workflow
 
 </div>
 
 <div class="card-body">
 
-<table class="table table-bordered">
+<pre>
+News Published
+      ↓
+Telegram Channel
+      ↓
+Telegram Groups
+      ↓
+Subscribers
+      ↓
+Website Traffic
+      ↓
+Analytics
+</pre>
 
-<tr>
-<th width="300">News Portal</th>
-<td>
-<span class="badge bg-success">
-Running
-</span>
-</td>
-</tr>
+</div>
 
-<tr>
-<th>Advertisement System</th>
-<td>
-<span class="badge bg-success">
-Running
-</span>
-</td>
-</tr>
+</div>
 
-<tr>
-<th>HRMS Integration</th>
-<td>
-<span class="badge bg-success">
-Connected
-</span>
-</td>
-</tr>
+<div class="card shadow mt-4">
 
-<tr>
-<th>Email Server</th>
-<td>
-<span class="badge bg-success">
-Active
-</span>
-</td>
-</tr>
+<div class="card-header bg-info text-white">
 
-<tr>
-<th>API Gateway</th>
-<td>
-<span class="badge bg-success">
-Healthy
-</span>
-</td>
-</tr>
+Features
 
-</table>
+</div>
+
+<div class="card-body">
+
+<ul>
+
+<li>Telegram Channel Management</li>
+
+<li>Telegram Group Management</li>
+
+<li>News Broadcasting</li>
+
+<li>Subscriber Tracking</li>
+
+<li>Auto News Sharing</li>
+
+<li>Traffic Generation</li>
+
+<li>Campaign Management</li>
+
+<li>Automation System</li>
+
+<li>Engagement Analytics</li>
+
+<li>Delivery Reports</li>
+
+<li>Growth Tracking</li>
+
+<li>Multi Channel Distribution</li>
+
+</ul>
 
 </div>
 

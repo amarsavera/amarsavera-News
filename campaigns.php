@@ -19,13 +19,13 @@ if(isset($_POST['save_campaign']))
 {
 
     $campaignCode =
-    'CMP-'.
+    'TCMP-'.
     date('Ym').
     '-'.
     rand(1000,9999);
 
     $stmt = $pdo->prepare("
-    INSERT INTO social_campaigns
+    INSERT INTO telegram_campaigns
     (
 
     campaign_code,
@@ -34,7 +34,7 @@ if(isset($_POST['save_campaign']))
 
     campaign_type,
 
-    platforms,
+    target_audience,
 
     budget,
 
@@ -85,7 +85,7 @@ if(isset($_POST['save_campaign']))
 
         $_POST['campaign_type'],
 
-        $_POST['platforms'],
+        $_POST['target_audience'],
 
         $_POST['budget'],
 
@@ -98,13 +98,13 @@ if(isset($_POST['save_campaign']))
     ]);
 
     $message =
-    'Campaign Created Successfully';
+    'Telegram Campaign Created Successfully';
 
 }
 
 $campaigns = $pdo->query("
 SELECT *
-FROM social_campaigns
+FROM telegram_campaigns
 ORDER BY id DESC
 LIMIT 500
 ")->fetchAll();
@@ -117,7 +117,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Campaign Management
+Telegram Campaign Management
 
 </h3>
 
@@ -133,9 +133,9 @@ Campaign Management
 
 <div class="card shadow">
 
-<div class="card-header bg-info text-white">
+<div class="card-header bg-primary text-white">
 
-Create Campaign
+Create Telegram Campaign
 
 </div>
 
@@ -165,24 +165,24 @@ required>
 name="campaign_type"
 class="form-control">
 
-<option value="brand">
-Brand Awareness
+<option value="news_promotion">
+News Promotion
+</option>
+
+<option value="advertisement">
+Advertisement
+</option>
+
+<option value="subscriber_growth">
+Subscriber Growth
 </option>
 
 <option value="election">
 Election Campaign
 </option>
 
-<option value="advertisement">
-Advertisement Campaign
-</option>
-
-<option value="hashtag">
-Hashtag Campaign
-</option>
-
-<option value="promotion">
-Promotion Campaign
+<option value="brand_awareness">
+Brand Awareness
 </option>
 
 </select>
@@ -191,48 +191,45 @@ Promotion Campaign
 
 <div class="col-md-5 mb-3">
 
-<label>Platforms</label>
+<label>Target Audience</label>
 
 <select
-name="platforms"
+name="target_audience"
 class="form-control">
 
-<option value="facebook">
-Facebook
+<option value="all_subscribers">
+All Subscribers
 </option>
 
-<option value="youtube">
-YouTube
+<option value="channel_followers">
+Channel Followers
 </option>
 
-<option value="instagram">
-Instagram
+<option value="district_users">
+District Users
 </option>
 
-<option value="twitter">
-X/Twitter
-</option>
-
-<option value="all">
-All Platforms
+<option value="premium_members">
+Premium Members
 </option>
 
 </select>
 
 </div>
 
-<div class="col-md-3 mb-3">
+<div class="col-md-4 mb-3">
 
 <label>Budget (₹)</label>
 
 <input
 type="number"
 name="budget"
-class="form-control">
+class="form-control"
+value="0">
 
 </div>
 
-<div class="col-md-3 mb-3">
+<div class="col-md-4 mb-3">
 
 <label>Start Date</label>
 
@@ -243,7 +240,7 @@ class="form-control">
 
 </div>
 
-<div class="col-md-3 mb-3">
+<div class="col-md-4 mb-3">
 
 <label>End Date</label>
 
@@ -259,7 +256,7 @@ class="form-control">
 <button
 type="submit"
 name="save_campaign"
-class="btn btn-info">
+class="btn btn-primary">
 
 Create Campaign
 
@@ -283,7 +280,7 @@ Campaign Register
 
 <div class="table-responsive">
 
-<table class="table table-bordered">
+<table class="table table-bordered table-hover">
 
 <thead class="table-dark">
 
@@ -292,7 +289,7 @@ Campaign Register
 <th>Code</th>
 <th>Name</th>
 <th>Type</th>
-<th>Platform</th>
+<th>Audience</th>
 <th>Budget</th>
 <th>Status</th>
 
@@ -310,9 +307,9 @@ Campaign Register
 
 <td><?= htmlspecialchars($campaign['campaign_name']); ?></td>
 
-<td><?= ucfirst($campaign['campaign_type']); ?></td>
+<td><?= ucwords(str_replace('_',' ',$campaign['campaign_type'])); ?></td>
 
-<td><?= ucfirst($campaign['platforms']); ?></td>
+<td><?= ucwords(str_replace('_',' ',$campaign['target_audience'])); ?></td>
 
 <td>₹<?= number_format($campaign['budget']); ?></td>
 
@@ -353,15 +350,15 @@ Campaign Workflow
 <pre>
 Campaign Created
         ↓
-Platforms Selected
+Telegram Distribution
         ↓
-Content Published
+Audience Reach
         ↓
-Audience Engagement
+Website Traffic
         ↓
-Performance Analysis
+Conversions
         ↓
-ROI Report
+ROI Analysis
 </pre>
 
 </div>
@@ -380,27 +377,27 @@ Campaign Features
 
 <ul>
 
-<li>Social Media Campaign Management</li>
+<li>Telegram Campaign Management</li>
 
-<li>Election Campaign Tracking</li>
+<li>News Promotion Campaigns</li>
 
-<li>Brand Awareness Campaign</li>
+<li>Advertisement Campaigns</li>
 
-<li>Advertisement Campaign</li>
+<li>Subscriber Growth Campaigns</li>
 
-<li>Hashtag Campaign</li>
-
-<li>Multi Platform Campaign</li>
-
-<li>Budget Tracking</li>
+<li>Election Campaigns</li>
 
 <li>Reach Tracking</li>
 
-<li>Engagement Tracking</li>
+<li>Click Tracking</li>
 
-<li>Campaign ROI Reports</li>
+<li>Budget Tracking</li>
 
-<li>Lead Generation Tracking</li>
+<li>ROI Analysis</li>
+
+<li>Campaign Reports</li>
+
+<li>Traffic Generation</li>
 
 <li>Performance Analytics</li>
 
