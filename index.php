@@ -1,116 +1,53 @@
 <?php
-session_start();
-
-if(!isset($_SESSION['admin_id']))
-{
-    header("Location: ../index.php");
-    exit;
-}
-?>
 
 require_once '../../includes/config.php';
 
-$reporters = $pdo->query("
-SELECT *
-FROM reporters
-ORDER BY id DESC
-")->fetchAll();
+if(session_status()===PHP_SESSION_NONE)
+{
+    session_start();
+}
 
-include '../layout/header.php';
+if(!isset($_SESSION['admin_id']))
+{
+    header("Location: /admin/index.php");
+    exit;
+}
+
+$totalRevenue=$pdo->query("
+SELECT SUM(amount)
+FROM payment_transactions
+WHERE status='success'
+")->fetchColumn();
+
 ?>
 
-<h3 class="mb-4">
-रिपोर्टर प्रबंधन
-</h3>
+<?php include '../layout/header.php'; ?>
 
-<a
-href="add.php"
-class="btn btn-success mb-3">
-
-नया रिपोर्टर जोड़ें
-
-</a>
+<div class="container-fluid">
 
 <div class="card">
 
+<div class="card-header bg-success text-white">
+
+Revenue Dashboard
+
+</div>
+
 <div class="card-body">
 
-<table class="table table-bordered">
+<h2>
 
-<thead>
+₹<?= number_format($totalRevenue,2); ?>
 
-<tr>
+</h2>
 
-<th>ID</th>
-<th>नाम</th>
-<th>मोबाइल</th>
-<th>जिला</th>
-<th>स्थिति</th>
-<th>कार्य</th>
+<p>
 
-</tr>
+Total Revenue
 
-</thead>
+</p>
 
-<tbody>
-
-<?php foreach($reporters as $row): ?>
-
-<tr>
-
-<td><?= $row['id']; ?></td>
-
-<td><?= htmlspecialchars($row['name']); ?></td>
-
-<td><?= htmlspecialchars($row['mobile']); ?></td>
-
-<td><?= htmlspecialchars($row['district']); ?></td>
-
-<td>
-
-<?php if($row['status']==1): ?>
-
-<span class="badge bg-success">
-सक्रिय
-</span>
-
-<?php else: ?>
-
-<span class="badge bg-danger">
-निष्क्रिय
-</span>
-
-<?php endif; ?>
-
-</td>
-
-<td>
-
-<a
-href="edit.php?id=<?= $row['id']; ?>"
-class="btn btn-primary btn-sm">
-
-संपादित करें
-
-</a>
-
-<a
-href="delete.php?id=<?= $row['id']; ?>"
-class="btn btn-danger btn-sm">
-
-हटाएँ
-
-</a>
-
-</td>
-
-</tr>
-
-<?php endforeach; ?>
-
-</tbody>
-
-</table>
+</div>
 
 </div>
 
