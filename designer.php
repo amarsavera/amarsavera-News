@@ -15,37 +15,38 @@ if(!isset($_SESSION['admin_id']))
 }
 $id=(int)($_GET['id'] ?? 0);
 
-if(isset($_POST['approve']))
-{
-
-$pdo->prepare("
-UPDATE advertisements
-SET status='approved'
+$stmt=$pdo->prepare("
+SELECT *
+FROM advertisements
 WHERE id=?
-")->execute([$id]);
+LIMIT 1
+");
 
-header("Location:approved.php");
-exit;
+$stmt->execute([$id]);
 
+$ad=$stmt->fetch();
+
+if(!$ad){
+die('Advertisement Not Found');
 }
 
-if(isset($_POST['revision']))
+if(isset($_POST['submit_design']))
 {
 
 $pdo->prepare("
 UPDATE advertisements
 SET
-status='designer_revision',
-client_note=?
+status='client_review',
+designer_note=?
 WHERE id=?
 ")->execute([
 
-$_POST['client_note'],
+$_POST['designer_note'],
 $id
 
 ]);
 
-header("Location:designer.php?id=".$id);
+header("Location:client-approval.php?id=".$id);
 exit;
 
 }
@@ -60,33 +61,30 @@ include '../../layout/header.php';
 
 <div class="card-header">
 
-Client Approval
+Designer Review
 
 </div>
 
 <div class="card-body">
 
+<h4>
+
+<?= htmlspecialchars($ad['title']); ?>
+
+</h4>
+
 <textarea
-name="client_note"
+name="designer_note"
 class="form-control"
-rows="5"
-placeholder="Revision Remark"></textarea>
+rows="5"></textarea>
 
 <br>
 
 <button
-name="approve"
+name="submit_design"
 class="btn btn-success">
 
-Approve
-
-</button>
-
-<button
-name="revision"
-class="btn btn-danger">
-
-Send Revision
+Send To Client
 
 </button>
 

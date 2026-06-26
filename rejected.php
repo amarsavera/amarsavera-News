@@ -1,6 +1,8 @@
 <?php
 
-require_once '../../includes/config.php';
+require_once '../../../includes/config.php';
+require_once '../../includes/auth.php';
+<?php
 
 if(session_status()===PHP_SESSION_NONE)
 {
@@ -9,198 +11,49 @@ if(session_status()===PHP_SESSION_NONE)
 
 if(!isset($_SESSION['admin_id']))
 {
-    header("Location: ../index.php");
+    header("Location: /admin/index.php");
     exit;
 }
 
-$id = (int)($_GET['id'] ?? 0);
 
-$stmt = $pdo->prepare("
+$list=$pdo->query("
 SELECT *
-FROM advertisement_bookings
-WHERE id=?
-LIMIT 1
-");
+FROM news
+WHERE status='rejected'
+ORDER BY id DESC
+")->fetchAll();
 
-$stmt->execute([$id]);
-
-$booking = $stmt->fetch();
-
-if(!$booking)
-{
-    die('Booking Not Found');
-}
-
-if($_SERVER['REQUEST_METHOD']=='POST')
-{
-
-    if(empty(trim($_POST['remarks'])))
-    {
-        die('Reject Reason Required');
-    }
-
-    $update = $pdo->prepare("
-    UPDATE advertisement_bookings
-    SET
-    status='rejected',
-    rejected_by=?,
-    rejected_at=NOW(),
-    rejection_reason=?
-    WHERE id=?
-    ");
-
-    $update->execute([
-
-        $_SESSION['admin_id'],
-
-        trim($_POST['remarks']),
-
-        $id
-
-    ]);
-
-    $approvalLog = $pdo->prepare("
-    INSERT INTO approval_logs
-    (
-        module_name,
-        record_id,
-        user_id,
-        action_type,
-        remarks,
-        created_at
-    )
-    VALUES
-    (
-        ?,?,?,?,?,
-        NOW()
-    )
-    ");
-
-    $approvalLog->execute([
-
-        'Advertisement Booking',
-
-        $id,
-
-        $_SESSION['admin_id'],
-
-        'rejected',
-
-        trim($_POST['remarks'])
-
-    ]);
-
-    $activity = $pdo->prepare("
-    INSERT INTO activity_logs
-    (
-        user_type,
-        user_id,
-        module_name,
-        action_name,
-        record_id,
-        remarks,
-        ip_address,
-        created_at
-    )
-    VALUES
-    (
-        ?,?,?,?,?,?,?,NOW()
-    )
-    ");
-
-    $activity->execute([
-
-        'admin',
-
-        $_SESSION['admin_id'],
-
-        'Advertisement Booking',
-
-        'Reject Booking',
-
-        $id,
-
-        trim($_POST['remarks']),
-
-        $_SERVER['REMOTE_ADDR'] ?? ''
-
-    ]);
-
-    header(
-    "Location:view.php?id=".$id
-    );
-
-    exit;
-}
-
-include '../layout/header.php';
+include '../../layout/header.php';
 
 ?>
 
 <div class="container-fluid">
 
-<div class="card shadow">
+<h3>Rejected News</h3>
 
-<div class="card-header bg-danger text-white">
+<table class="table table-bordered">
 
-Reject Advertisement Booking
+<tr>
 
-</div>
+<th>ID</th>
+<th>Title</th>
 
-<div class="card-body">
+</tr>
 
-<h5>
+<?php foreach($list as $row): ?>
 
-Booking Code :
+<tr>
 
-<?= htmlspecialchars(
-$booking['booking_code']
-); ?>
+<td><?= $row['id']; ?></td>
 
-</h5>
+<td><?= htmlspecialchars($row['title']); ?></td>
 
-<hr>
+</tr>
 
-<form method="post">
+<?php endforeach; ?>
 
-<div class="mb-3">
-
-<label>
-
-Reject Reason
-
-</label>
-
-<textarea
-name="remarks"
-class="form-control"
-rows="5"
-required></textarea>
+</table>
 
 </div>
 
-<button
-type="submit"
-class="btn btn-danger">
-
-Reject Booking
-
-</button>
-
-<a
-href="view.php?id=<?= $booking['id']; ?>"
-class="btn btn-secondary">
-
-Cancel
-
-</a>
-
-</form>
-
-</div>
-
-</div>
-
-</div>
-
-<?php include '../layout/footer.php'; ?>
+<?php include '../../layout/footer.php'; ?>

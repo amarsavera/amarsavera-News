@@ -1,7 +1,7 @@
 <?php
 
 require_once '../../../includes/config.php';
-require_once '../../includes/auth.php';
+require_once '../includes/auth.php';
 
 if(session_status()===PHP_SESSION_NONE)
 {
@@ -13,6 +13,7 @@ if(!isset($_SESSION['admin_id']))
     header("Location: /admin/index.php");
     exit;
 }
+
 $id=(int)($_GET['id'] ?? 0);
 
 if(isset($_POST['approve']))
