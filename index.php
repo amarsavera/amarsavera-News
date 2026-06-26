@@ -4,87 +4,53 @@ require_once '../../includes/config.php';
 
 session_start();
 
-if(!isset($_SESSION['admin_id']))
-{
-exit;
-}
+$list=$pdo->query("
+SELECT *
+FROM teams
+ORDER BY id DESC
+")->fetchAll();
 
 include '../layout/header.php';
+
 ?>
 
 <div class="container-fluid">
 
-<div class="row">
-
-<div class="col-md-3">
-
 <div class="card">
+
+<div class="card-header bg-primary text-white">
+
+Teams
+
+</div>
 
 <div class="card-body">
 
-<h5>Users</h5>
+<table class="table table-bordered">
 
-<a href="../users/index.php">
-Manage
-</a>
+<tr>
 
-</div>
+<th>ID</th>
+<th>Team</th>
+<th>Status</th>
 
-</div>
+</tr>
 
-</div>
+<?php foreach($list as $team): ?>
 
-<div class="col-md-3">
+<tr>
 
-<div class="card">
+<td><?= $team['id']; ?></td>
 
-<div class="card-body">
+<td><?= htmlspecialchars($team['team_name']); ?></td>
 
-<h5>Rights</h5>
+<td><?= $team['status']; ?></td>
 
-<a href="../users/rights/index.php">
-Manage
-</a>
+</tr>
 
-</div>
+<?php endforeach; ?>
 
-</div>
-
-</div>
-
-<div class="col-md-3">
-
-<div class="card">
-
-<div class="card-body">
-
-<h5>Roles</h5>
-
-<a href="../rbac/roles/index.php">
-Manage
-</a>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-3">
-
-<div class="card">
-
-<div class="card-body">
-
-<h5>Activity Logs</h5>
-
-<a href="../activity-logs/index.php">
-View
-</a>
-
-</div>
-
-</div>
+</table>
 
 </div>
 
