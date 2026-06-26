@@ -11,110 +11,40 @@ if(!isset($_SESSION['admin_id'])){
     exit;
 }
 
-$states = $pdo->query("
-SELECT *
-FROM states
-ORDER BY state_name ASC
+$subscribers = $pdo->query("
+SELECT
+s.*,
+sp.plan_name
+
+FROM subscribers s
+
+LEFT JOIN subscription_plans sp
+ON sp.id=s.plan_id
+
+ORDER BY s.id DESC
 ")->fetchAll();
 
 include '../layout/header.php';
-?>
+?><div class="container-fluid"><div class="d-flex justify-content-between mb-3"><h3>Subscriber Management</h3><a href="create.php"
+class="btn btn-success">
 
-<div class="container-fluid">
+<i class="fa fa-plus"></i>
+Add Subscriber
 
-<div class="d-flex justify-content-between mb-3">
+</a></div><div class="card shadow-sm"><div class="card-body"><table class="table table-bordered"><thead class="table-dark"><tr><th>ID</th>
+<th>UID</th>
+<th>Name</th>
+<th>Mobile</th>
+<th>Plan</th>
+<th>Status</th>
+<th>Action</th></tr></thead><tbody><?php foreach($subscribers as $row): ?><tr><td><?= $row['id']; ?></td><td><?= htmlspecialchars($row['uid']); ?></td><td><?= htmlspecialchars($row['name']); ?></td><td><?= htmlspecialchars($row['mobile']); ?></td><td><?= htmlspecialchars($row['plan_name']); ?></td><td><?= htmlspecialchars($row['status']); ?></td><td><a href="view.php?id=<?= $row['id']; ?>"
+class="btn btn-info btn-sm">
 
-<h3>State Management</h3>
+View
 
-<a href="create.php" class="btn btn-success">
-    <i class="fa fa-plus"></i> Add State
-</a>
-
-</div>
-
-<div class="card shadow-sm">
-
-<div class="card-body">
-
-<div class="table-responsive">
-
-<table class="table table-bordered table-hover">
-
-<thead class="table-dark">
-
-<tr>
-    <th>ID</th>
-    <th>State Name</th>
-    <th>State Code</th>
-    <th>Status</th>
-    <th>Action</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-<?php foreach($states as $state): ?>
-
-<tr>
-
-<td><?= $state['id']; ?></td>
-
-<td><?= htmlspecialchars($state['state_name']); ?></td>
-
-<td><?= htmlspecialchars($state['state_code']); ?></td>
-
-<td>
-
-<?php if($state['status']=='active'): ?>
-
-<span class="badge bg-success">
-Active
-</span>
-
-<?php else: ?>
-
-<span class="badge bg-danger">
-Inactive
-</span>
-
-<?php endif; ?>
-
-</td>
-
-<td>
-
-<a href="edit.php?id=<?= $state['id']; ?>"
+</a><a href="edit.php?id=<?= $row['id']; ?>"
 class="btn btn-primary btn-sm">
 
 Edit
 
-</a>
-
-<a href="delete.php?id=<?= $state['id']; ?>"
-class="btn btn-danger btn-sm"
-onclick="return confirm('Delete State?');">
-
-Delete
-
-</a>
-
-</td>
-
-</tr>
-
-<?php endforeach; ?>
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<?php include '../layout/footer.php'; ?>
+</a></td></tr><?php endforeach; ?></tbody></table></div></div></div><?php include '../layout/footer.php'; ?>
