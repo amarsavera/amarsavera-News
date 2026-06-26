@@ -2,46 +2,53 @@
 
 require_once '../../includes/config.php';
 
-if(session_status()===PHP_SESSION_NONE){
-    session_start();
-}
-
-if(!isset($_SESSION['admin_id'])){
-    header("Location: ../index.php");
-    exit;
-}
-
-$roles = $pdo->query("
-SELECT
-r.*,
-d.department_name
-
-FROM roles r
-
-LEFT JOIN departments d
-ON d.id=r.department_id
-
-ORDER BY r.role_name ASC
-")->fetchAll();
+$data = $pdo->query("
+SELECT *
+FROM seo_settings
+LIMIT 1
+")->fetch();
 
 include '../layout/header.php';
-?><div class="container-fluid"><div class="d-flex justify-content-between mb-3"><h3>रोल प्रबंधन</h3><a href="create.php"
+?>
+
+<h3 class="mb-4">
+SEO नियंत्रण केंद्र
+</h3>
+
+<form method="POST">
+
+<div class="card">
+
+<div class="card-body">
+
+<input
+type="text"
+class="form-control mb-3"
+placeholder="साइट शीर्षक">
+
+<textarea
+class="form-control mb-3"
+rows="4"
+placeholder="Meta Description">
+</textarea>
+
+<textarea
+class="form-control mb-3"
+rows="4"
+placeholder="Meta Keywords">
+</textarea>
+
+<button
 class="btn btn-success">
 
-<i class="fa fa-plus"></i>
-नया रोल
+सहेजें
 
-</a></div><div class="card shadow-sm"><div class="card-body"><table class="table table-bordered"><thead class="table-dark"><tr><th>ID</th>
-<th>Role Name</th>
-<th>Department</th>
-<th>Action</th></tr></thead><tbody><?php foreach($roles as $role): ?><tr><td><?= $role['id']; ?></td><td><?= htmlspecialchars($role['role_name']); ?></td><td><?= htmlspecialchars($role['department_name']); ?></td><td><a href="edit.php?id=<?= $role['id']; ?>"
-class="btn btn-primary btn-sm">
+</button>
 
-Edit
+</div>
 
-</a><a href="permissions.php?id=<?= $role['id']; ?>"
-class="btn btn-warning btn-sm">
+</div>
 
-Permissions
+</form>
 
-</a></td></tr><?php endforeach; ?></tbody></table></div></div></div><?php include '../layout/footer.php'; ?>
+<?php include '../layout/footer.php'; ?>
