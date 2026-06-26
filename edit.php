@@ -13,51 +13,43 @@ exit;
 
 $id = (int)($_GET['id'] ?? 0);
 
-$plans = $pdo->query("
-SELECT *
-FROM subscription_plans
-WHERE status=1
-")->fetchAll();
-
 $stmt = $pdo->prepare("
 SELECT *
-FROM subscribers
+FROM subscription_plans
 WHERE id=?
 ");
 
 $stmt->execute([$id]);
 
-$subscriber = $stmt->fetch();
+$plan = $stmt->fetch();
 
-if(!$subscriber){
-die('Subscriber Not Found');
+if(!$plan){
+die('Plan Not Found');
 }
 
 if($_SERVER['REQUEST_METHOD']=='POST'){
 
 $update = $pdo->prepare("
-UPDATE subscribers
+UPDATE subscription_plans
 SET
-name=?,
-mobile=?,
-email=?,
-plan_id=?,
+plan_name=?,
+amount=?,
+duration_days=?,
 status=?
 WHERE id=?
 ");
 
 $update->execute([
 
-$_POST['name'],
-$_POST['mobile'],
-$_POST['email'],
-$_POST['plan_id'],
+$_POST['plan_name'],
+$_POST['amount'],
+$_POST['duration_days'],
 $_POST['status'],
 $id
 
 ]);
 
-header("Location:view.php?id=".$id);
+header("Location:index.php");
 exit;
 }
 

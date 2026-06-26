@@ -11,37 +11,43 @@ if(!isset($_SESSION['admin_id'])){
     exit;
 }
 
-$plans = $pdo->query("
-SELECT *
-FROM subscription_plans
-WHERE status=1
-ORDER BY plan_name
-")->fetchAll();
-
 if($_SERVER['REQUEST_METHOD']=='POST'){
 
-    $nextId = $pdo->query("
-    SELECT IFNULL(MAX(id),0)+1
-    FROM subscribers
-    ")->fetchColumn();
-
-    $uid = 'SGN'.str_pad(
-        $nextId,
-        7,
-        '0',
-        STR_PAD_LEFT
-    );
-
     $stmt = $pdo->prepare("
-    INSERT INTO subscribers
+    INSERT INTO subscription_plans
     (
-        uid,
-        source_system,
-        name,
-        mobile,
-        email,
-        plan_id,
+        plan_name,
+        amount,
+        duration_days,
         status
+    )
+    VALUES
+    (
+        ?,?,?,?
+    )
+    ");
+
+    $stmt->execute([
+
+        $_POST['plan_name'],
+        $_POST['amount'],
+        $_POST['duration_days'],
+        $_POST['status']
+
+    ]);
+
+    $recordId = $pdo->lastInsertId();
+
+    $log = $pdo->prepare("
+    INSERT INTO activity_logs
+    (
+        user_type,
+        user_id,
+        module_name,
+        action_name,
+        record_id,
+        remarks,
+        ip_address
     )
     VALUES
     (
@@ -49,16 +55,14 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
     )
     ");
 
-    $stmt->execute([
-
-        $uid,
-        'AMAR_SAVERA',
-        $_POST['name'],
-        $_POST['mobile'],
-        $_POST['email'],
-        $_POST['plan_id'],
-        $_POST['status']
-
+    $log->execute([
+        'admin',
+        $_SESSION['admin_id'],
+        'Subscription Plans',
+        'Create Plan',
+        $recordId,
+        'New Subscription Plan Created',
+        $_SERVER['REMOTE_ADDR']
     ]);
 
     header("Location:index.php");
@@ -66,51 +70,44 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 }
 
 include '../layout/header.php';
-?><div class="container-fluid"><div class="card shadow-sm"><div class="card-header bg-success text-white">Add Subscriber
+?><div class="container-fluid"><div class="card shadow-sm"><div class="card-header bg-success text-white">Add Subscription Plan
 
-</div><div class="card-body"><form method="post"><div class="row"><div class="col-md-6 mb-3"><label>Name</label>
-
-<input
-type="text"
-name="name"
-class="form-control"
-required>
-
-</div><div class="col-md-6 mb-3"><label>Mobile</label>
+</div><div class="card-body"><form method="post"><div class="mb-3"><label>Plan Name</label>
 
 <input
 type="text"
-name="mobile"
+name="plan_name"
 class="form-control"
 required>
 
-</div><div class="col-md-6 mb-3"><label>Email</label>
+</div><div class="mb-3"><label>Amount</label>
 
 <input
-type="email"
-name="email"
-class="form-control">
+type="number"
+step="0.01"
+name="amount"
+class="form-control"
+required>
 
-</div><div class="col-md-6 mb-3"><label>Plan</label>
+</div><div class="mb-3"><label>Duration (Days)</label>
 
-<select
-name="plan_id"
-class="form-control">
+<input
+type="number"
+name="duration_days"
+class="form-control"
+required>
 
-<?php foreach($plans as $plan): ?><option value="<?= $plan['id']; ?>"><?= htmlspecialchars($plan['plan_name']); ?></option><?php endforeach; ?></select></div><div class="col-md-6 mb-3"><label>Status</label>
+</div><div class="mb-3"><label>Status</label>
 
 <select
 name="status"
 class="form-control">
 
-<option value="active">
-Active
-</option><option value="inactive">
-Inactive
-</option></select></div></div><button
+<option value="1">Active</option>
+<option value="0">Inactive</option></select></div><button
 type="submit"
 class="btn btn-success">
 
-Save Subscriber
+Save Plan
 
 </button></form></div></div></div><?php include '../layout/footer.php'; ?>
