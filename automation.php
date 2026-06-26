@@ -19,13 +19,13 @@ if(isset($_POST['save_automation']))
 {
 
     $automationCode =
-    'TAUTO-'.
+    'WAUTO-'.
     date('Ym').
     '-'.
     rand(1000,9999);
 
     $stmt = $pdo->prepare("
-    INSERT INTO telegram_automation
+    INSERT INTO whatsapp_automation
     (
 
     automation_code,
@@ -36,7 +36,7 @@ if(isset($_POST['save_automation']))
 
     trigger_event,
 
-    target_destination,
+    target_channel,
 
     status,
 
@@ -79,20 +79,20 @@ if(isset($_POST['save_automation']))
 
         $_POST['trigger_event'],
 
-        $_POST['target_destination'],
+        $_POST['target_channel'],
 
         $_SESSION['admin_id']
 
     ]);
 
     $message =
-    'Telegram Automation Created Successfully';
+    'Automation Created Successfully';
 
 }
 
 $automations = $pdo->query("
 SELECT *
-FROM telegram_automation
+FROM whatsapp_automation
 ORDER BY id DESC
 LIMIT 500
 ")->fetchAll();
@@ -105,7 +105,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Telegram Automation Center
+WhatsApp Automation Center
 
 </h3>
 
@@ -121,7 +121,7 @@ Telegram Automation Center
 
 <div class="card shadow">
 
-<div class="card-header bg-primary text-white">
+<div class="card-header bg-success text-white">
 
 Create Automation
 
@@ -157,16 +157,16 @@ class="form-control">
 Auto News Sharing
 </option>
 
-<option value="breaking_alert">
-Breaking News Alert
-</option>
-
-<option value="scheduled_post">
-Scheduled Post
+<option value="breaking_news">
+Breaking News Automation
 </option>
 
 <option value="welcome_message">
 Welcome Message
+</option>
+
+<option value="scheduled_broadcast">
+Scheduled Broadcast
 </option>
 
 <option value="traffic_campaign">
@@ -189,16 +189,16 @@ class="form-control">
 News Publish
 </option>
 
-<option value="breaking_news">
-Breaking News
-</option>
-
 <option value="new_subscriber">
 New Subscriber
 </option>
 
-<option value="scheduled_time">
-Scheduled Time
+<option value="breaking_alert">
+Breaking Alert
+</option>
+
+<option value="schedule_time">
+Schedule Time
 </option>
 
 </select>
@@ -210,19 +210,23 @@ Scheduled Time
 <label>Target</label>
 
 <select
-name="target_destination"
+name="target_channel"
 class="form-control">
 
 <option value="channel">
-Telegram Channel
+WhatsApp Channel
 </option>
 
-<option value="group">
-Telegram Group
+<option value="groups">
+Groups
+</option>
+
+<option value="broadcast">
+Broadcast List
 </option>
 
 <option value="all">
-All Destinations
+All Targets
 </option>
 
 </select>
@@ -234,7 +238,7 @@ All Destinations
 <button
 type="submit"
 name="save_automation"
-class="btn btn-primary">
+class="btn btn-success">
 
 Create Automation
 
@@ -248,7 +252,7 @@ Create Automation
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-success text-white">
+<div class="card-header bg-primary text-white">
 
 Automation Register
 
@@ -289,7 +293,7 @@ Automation Register
 
 <td><?= ucwords(str_replace('_',' ',$automation['trigger_event'])); ?></td>
 
-<td><?= ucfirst($automation['target_destination']); ?></td>
+<td><?= ucfirst($automation['target_channel']); ?></td>
 
 <td>
 
@@ -330,11 +334,11 @@ News Published
       ↓
 Automation Trigger
       ↓
-Telegram Channel
+WhatsApp Channel
       ↓
-Telegram Groups
+Groups
       ↓
-Subscribers
+Broadcast Lists
       ↓
 Traffic Generated
 </pre>
@@ -357,27 +361,27 @@ Automation Features
 
 <li>Auto News Sharing</li>
 
-<li>Telegram Bot Integration</li>
+<li>Scheduled Broadcasts</li>
 
-<li>Auto Channel Posting</li>
+<li>Breaking News Automation</li>
 
-<li>Auto Group Posting</li>
+<li>Channel Auto Posting</li>
 
-<li>Breaking News Alerts</li>
+<li>Group Auto Posting</li>
 
-<li>Scheduled Posts</li>
-
-<li>Auto Welcome Messages</li>
+<li>Auto Subscriber Welcome Message</li>
 
 <li>Auto Traffic Campaigns</li>
 
+<li>WhatsApp Bot Integration</li>
+
+<li>Workflow Automation</li>
+
 <li>Automation Logs</li>
 
-<li>Workflow Management</li>
+<li>Multi Channel Distribution</li>
 
-<li>Real Time Distribution</li>
-
-<li>Multi Channel Publishing</li>
+<li>Real Time Notifications</li>
 
 </ul>
 

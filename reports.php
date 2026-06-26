@@ -15,32 +15,32 @@ if(!isset($_SESSION['admin_id']))
 
 $totalChannels = $pdo->query("
 SELECT COUNT(*)
-FROM telegram_channels
+FROM whatsapp_channels
 ")->fetchColumn();
 
 $totalGroups = $pdo->query("
 SELECT COUNT(*)
-FROM telegram_groups
+FROM whatsapp_groups
 ")->fetchColumn();
 
 $totalSubscribers = $pdo->query("
 SELECT COUNT(*)
-FROM telegram_subscribers
+FROM whatsapp_subscribers
 ")->fetchColumn();
 
 $totalBroadcasts = $pdo->query("
 SELECT COUNT(*)
-FROM telegram_broadcasts
+FROM whatsapp_broadcasts
 ")->fetchColumn();
 
 $totalCampaigns = $pdo->query("
 SELECT COUNT(*)
-FROM telegram_campaigns
+FROM whatsapp_campaigns
 ")->fetchColumn();
 
 $totalAutomations = $pdo->query("
 SELECT COUNT(*)
-FROM telegram_automation
+FROM whatsapp_automation
 ")->fetchColumn();
 
 include '../layout/header.php';
@@ -51,7 +51,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Telegram Reports & Analytics
+WhatsApp Reports & Analytics
 
 </h3>
 
@@ -59,7 +59,7 @@ Telegram Reports & Analytics
 
 <div class="col-md-2">
 
-<div class="card border-primary">
+<div class="card border-success">
 
 <div class="card-body text-center">
 
@@ -75,7 +75,7 @@ Telegram Reports & Analytics
 
 <div class="col-md-2">
 
-<div class="card border-success">
+<div class="card border-primary">
 
 <div class="card-body text-center">
 
@@ -159,7 +159,7 @@ Telegram Reports & Analytics
 
 <div class="card-header bg-success text-white">
 
-Telegram Summary Report
+WhatsApp Summary Report
 
 </div>
 
@@ -218,7 +218,7 @@ Available Reports
 <div class="col-md-2 mb-2">
 
 <a href="channel-report.php"
-class="btn btn-primary w-100">
+class="btn btn-success w-100">
 
 Channels
 
@@ -229,7 +229,7 @@ Channels
 <div class="col-md-2 mb-2">
 
 <a href="group-report.php"
-class="btn btn-success w-100">
+class="btn btn-primary w-100">
 
 Groups
 
@@ -272,10 +272,10 @@ Campaigns
 
 <div class="col-md-2 mb-2">
 
-<a href="automation-report.php"
+<a href="analytics-report.php"
 class="btn btn-dark w-100">
 
-Automation
+Analytics
 
 </a>
 
@@ -291,7 +291,7 @@ Automation
 
 <div class="card-header bg-warning text-dark">
 
-Telegram Reports Workflow
+WhatsApp Reports Workflow
 
 </div>
 
@@ -300,11 +300,13 @@ Telegram Reports Workflow
 <pre>
 News Distribution
         ↓
-Audience Reach
+Delivery Tracking
         ↓
-Engagement
+Subscriber Engagement
         ↓
-Traffic Analytics
+Website Traffic
+        ↓
+Analytics
         ↓
 Reports
 </pre>
@@ -329,15 +331,15 @@ Reports Features
 
 <li>Group Reports</li>
 
-<li>Subscriber Reports</li>
-
 <li>Broadcast Reports</li>
+
+<li>Subscriber Reports</li>
 
 <li>Campaign Reports</li>
 
-<li>Automation Reports</li>
+<li>Delivery Analytics</li>
 
-<li>Reach Analytics</li>
+<li>Click Analytics</li>
 
 <li>Traffic Analytics</li>
 

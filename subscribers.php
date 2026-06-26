@@ -19,20 +19,20 @@ if(isset($_POST['save_subscriber']))
 {
 
     $subscriberCode =
-    'TSUB-'.
+    'SUB-'.
     date('Ym').
     '-'.
     rand(1000,9999);
 
     $stmt = $pdo->prepare("
-    INSERT INTO telegram_subscribers
+    INSERT INTO whatsapp_subscribers
     (
 
     subscriber_code,
 
     full_name,
 
-    telegram_username,
+    mobile_number,
 
     district,
 
@@ -75,7 +75,7 @@ if(isset($_POST['save_subscriber']))
 
         $_POST['full_name'],
 
-        $_POST['telegram_username'],
+        $_POST['mobile_number'],
 
         $_POST['district'],
 
@@ -86,13 +86,13 @@ if(isset($_POST['save_subscriber']))
     ]);
 
     $message =
-    'Telegram Subscriber Added Successfully';
+    'Subscriber Added Successfully';
 
 }
 
 $subscribers = $pdo->query("
 SELECT *
-FROM telegram_subscribers
+FROM whatsapp_subscribers
 ORDER BY id DESC
 LIMIT 500
 ")->fetchAll();
@@ -105,7 +105,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Telegram Subscriber Management
+Subscriber Management
 
 </h3>
 
@@ -121,7 +121,7 @@ Telegram Subscriber Management
 
 <div class="card shadow">
 
-<div class="card-header bg-primary text-white">
+<div class="card-header bg-success text-white">
 
 Add Subscriber
 
@@ -147,13 +147,13 @@ required>
 
 <div class="col-md-3 mb-3">
 
-<label>Telegram Username</label>
+<label>Mobile Number</label>
 
 <input
 type="text"
-name="telegram_username"
+name="mobile_number"
 class="form-control"
-placeholder="@username">
+required>
 
 </div>
 
@@ -170,30 +170,30 @@ class="form-control">
 
 <div class="col-md-3 mb-3">
 
-<label>Subscriber Source</label>
+<label>Subscription Source</label>
 
 <select
 name="source"
 class="form-control">
 
-<option value="telegram_channel">
-Telegram Channel
-</option>
-
-<option value="telegram_group">
-Telegram Group
-</option>
-
 <option value="website">
 Website
+</option>
+
+<option value="whatsapp_channel">
+WhatsApp Channel
 </option>
 
 <option value="facebook">
 Facebook
 </option>
 
-<option value="whatsapp">
-WhatsApp
+<option value="youtube">
+YouTube
+</option>
+
+<option value="instagram">
+Instagram
 </option>
 
 <option value="referral">
@@ -209,7 +209,7 @@ Referral
 <button
 type="submit"
 name="save_subscriber"
-class="btn btn-primary">
+class="btn btn-success">
 
 Add Subscriber
 
@@ -223,7 +223,7 @@ Add Subscriber
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-success text-white">
+<div class="card-header bg-primary text-white">
 
 Subscriber Register
 
@@ -241,7 +241,7 @@ Subscriber Register
 
 <th>Code</th>
 <th>Name</th>
-<th>Username</th>
+<th>Mobile</th>
 <th>District</th>
 <th>Source</th>
 <th>Status</th>
@@ -260,11 +260,11 @@ Subscriber Register
 
 <td><?= htmlspecialchars($subscriber['full_name']); ?></td>
 
-<td><?= htmlspecialchars($subscriber['telegram_username']); ?></td>
+<td><?= htmlspecialchars($subscriber['mobile_number']); ?></td>
 
 <td><?= htmlspecialchars($subscriber['district']); ?></td>
 
-<td><?= ucfirst(str_replace('_',' ',$subscriber['source'])); ?></td>
+<td><?= ucfirst($subscriber['source']); ?></td>
 
 <td>
 
@@ -309,7 +309,7 @@ News Delivered
         ↓
 Website Visit
         ↓
-Engagement
+Engagement Tracking
         ↓
 Analytics
 </pre>
@@ -330,29 +330,29 @@ Subscriber Features
 
 <ul>
 
-<li>Telegram Subscriber Management</li>
+<li>Subscriber Management</li>
 
-<li>Channel Subscribers</li>
-
-<li>Group Members</li>
+<li>WhatsApp Channel Subscribers</li>
 
 <li>District Wise Subscribers</li>
 
 <li>Active/Inactive Subscribers</li>
 
-<li>Subscriber Analytics</li>
+<li>Subscription Source Tracking</li>
+
+<li>Import Subscribers</li>
+
+<li>Export Subscribers</li>
 
 <li>Growth Tracking</li>
 
-<li>Engagement Reports</li>
+<li>Subscriber Analytics</li>
 
-<li>Import / Export</li>
+<li>Engagement Reports</li>
 
 <li>Audience Database</li>
 
-<li>Traffic Monitoring</li>
-
-<li>Performance Reports</li>
+<li>Subscriber Reports</li>
 
 </ul>
 

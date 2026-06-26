@@ -19,13 +19,13 @@ if(isset($_POST['save_campaign']))
 {
 
     $campaignCode =
-    'TCMP-'.
+    'WCMP-'.
     date('Ym').
     '-'.
     rand(1000,9999);
 
     $stmt = $pdo->prepare("
-    INSERT INTO telegram_campaigns
+    INSERT INTO whatsapp_campaigns
     (
 
     campaign_code,
@@ -98,13 +98,13 @@ if(isset($_POST['save_campaign']))
     ]);
 
     $message =
-    'Telegram Campaign Created Successfully';
+    'WhatsApp Campaign Created Successfully';
 
 }
 
 $campaigns = $pdo->query("
 SELECT *
-FROM telegram_campaigns
+FROM whatsapp_campaigns
 ORDER BY id DESC
 LIMIT 500
 ")->fetchAll();
@@ -117,7 +117,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Telegram Campaign Management
+WhatsApp Campaign Management
 
 </h3>
 
@@ -133,9 +133,9 @@ Telegram Campaign Management
 
 <div class="card shadow">
 
-<div class="card-header bg-primary text-white">
+<div class="card-header bg-success text-white">
 
-Create Telegram Campaign
+Create Campaign
 
 </div>
 
@@ -173,12 +173,12 @@ News Promotion
 Advertisement
 </option>
 
-<option value="subscriber_growth">
-Subscriber Growth
-</option>
-
 <option value="election">
 Election Campaign
+</option>
+
+<option value="subscriber_growth">
+Subscriber Growth
 </option>
 
 <option value="brand_awareness">
@@ -201,16 +201,16 @@ class="form-control">
 All Subscribers
 </option>
 
-<option value="channel_followers">
-Channel Followers
-</option>
-
 <option value="district_users">
 District Users
 </option>
 
-<option value="premium_members">
-Premium Members
+<option value="channel_followers">
+Channel Followers
+</option>
+
+<option value="premium_users">
+Premium Users
 </option>
 
 </select>
@@ -256,7 +256,7 @@ class="form-control">
 <button
 type="submit"
 name="save_campaign"
-class="btn btn-primary">
+class="btn btn-success">
 
 Create Campaign
 
@@ -270,7 +270,7 @@ Create Campaign
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-success text-white">
+<div class="card-header bg-primary text-white">
 
 Campaign Register
 
@@ -286,7 +286,7 @@ Campaign Register
 
 <tr>
 
-<th>Code</th>
+<th>Campaign Code</th>
 <th>Name</th>
 <th>Type</th>
 <th>Audience</th>
@@ -350,9 +350,9 @@ Campaign Workflow
 <pre>
 Campaign Created
         ↓
-Telegram Distribution
+Broadcast Sent
         ↓
-Audience Reach
+Subscribers Reached
         ↓
 Website Traffic
         ↓
@@ -377,29 +377,29 @@ Campaign Features
 
 <ul>
 
-<li>Telegram Campaign Management</li>
+<li>WhatsApp Campaign Management</li>
 
 <li>News Promotion Campaigns</li>
 
 <li>Advertisement Campaigns</li>
 
-<li>Subscriber Growth Campaigns</li>
-
 <li>Election Campaigns</li>
 
-<li>Reach Tracking</li>
+<li>Subscriber Growth Campaigns</li>
 
 <li>Click Tracking</li>
 
+<li>Reach Tracking</li>
+
 <li>Budget Tracking</li>
 
-<li>ROI Analysis</li>
+<li>ROI Reports</li>
 
-<li>Campaign Reports</li>
+<li>Campaign Analytics</li>
 
-<li>Traffic Generation</li>
+<li>Conversion Tracking</li>
 
-<li>Performance Analytics</li>
+<li>Performance Reports</li>
 
 </ul>
 

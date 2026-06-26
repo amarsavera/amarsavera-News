@@ -19,13 +19,13 @@ if(isset($_POST['save_group']))
 {
 
     $groupCode =
-    'TGP-'.
+    'WGP-'.
     date('Ym').
     '-'.
     rand(1000,9999);
 
     $stmt = $pdo->prepare("
-    INSERT INTO telegram_groups
+    INSERT INTO whatsapp_groups
     (
 
     group_code,
@@ -90,13 +90,13 @@ if(isset($_POST['save_group']))
     ]);
 
     $message =
-    'Telegram Group Created Successfully';
+    'WhatsApp Group Created Successfully';
 
 }
 
 $groups = $pdo->query("
 SELECT *
-FROM telegram_groups
+FROM whatsapp_groups
 ORDER BY id DESC
 LIMIT 500
 ")->fetchAll();
@@ -109,7 +109,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Telegram Groups Management
+WhatsApp Groups Management
 
 </h3>
 
@@ -125,9 +125,9 @@ Telegram Groups Management
 
 <div class="card shadow">
 
-<div class="card-header bg-success text-white">
+<div class="card-header bg-primary text-white">
 
-Create Telegram Group
+Create WhatsApp Group
 
 </div>
 
@@ -157,28 +157,24 @@ required>
 name="group_type"
 class="form-control">
 
-<option value="state_team">
-State Team
+<option value="state_head">
+State Head Group
 </option>
 
-<option value="bureau_team">
-Bureau Team
+<option value="bureau_chief">
+Bureau Chief Group
 </option>
 
-<option value="district_team">
-District Team
+<option value="district_reporter">
+District Reporter Group
 </option>
 
-<option value="reporter_team">
-Reporter Team
+<option value="editorial">
+Editorial Group
 </option>
 
-<option value="editorial_team">
-Editorial Team
-</option>
-
-<option value="emergency_alert">
-Emergency Alert
+<option value="emergency">
+Emergency Alert Group
 </option>
 
 </select>
@@ -198,7 +194,7 @@ class="form-control">
 
 <div class="col-md-3 mb-3">
 
-<label>Total Members</label>
+<label>Members</label>
 
 <input
 type="number"
@@ -210,13 +206,13 @@ readonly>
 
 <div class="col-md-12 mb-3">
 
-<label>Telegram Group Link</label>
+<label>Group Invite Link</label>
 
 <input
 type="text"
 name="group_link"
 class="form-control"
-placeholder="https://t.me/+groupinvite">
+placeholder="https://chat.whatsapp.com/...">
 
 </div>
 
@@ -225,7 +221,7 @@ placeholder="https://t.me/+groupinvite">
 <button
 type="submit"
 name="save_group"
-class="btn btn-success">
+class="btn btn-primary">
 
 Create Group
 
@@ -239,7 +235,7 @@ Create Group
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-primary text-white">
+<div class="card-header bg-success text-white">
 
 Group Register
 
@@ -310,7 +306,7 @@ Group Register
 
 <div class="card-header bg-warning text-dark">
 
-Telegram Group Workflow
+Group Workflow
 
 </div>
 
@@ -319,11 +315,11 @@ Telegram Group Workflow
 <pre>
 Breaking News
       ↓
-State Team
+State Head Group
       ↓
-District Team
+Bureau Chief Group
       ↓
-Reporter Team
+Reporter Group
       ↓
 Ground Coverage
 </pre>
@@ -344,29 +340,29 @@ Group Features
 
 <ul>
 
-<li>Telegram Group Management</li>
+<li>District Wise WhatsApp Groups</li>
 
 <li>Reporter Groups</li>
 
-<li>Bureau Groups</li>
+<li>Bureau Chief Groups</li>
 
-<li>Editorial Groups</li>
+<li>State Head Groups</li>
 
-<li>District Groups</li>
+<li>Editorial Communication</li>
 
-<li>Member Tracking</li>
+<li>Emergency Alert Groups</li>
 
-<li>Internal Communication</li>
+<li>Group Member Management</li>
 
-<li>News Sharing</li>
+<li>Group Activity Tracking</li>
 
-<li>Emergency Alerts</li>
-
-<li>Group Reports</li>
+<li>News Sharing System</li>
 
 <li>Moderation Tools</li>
 
-<li>Coordination Network</li>
+<li>Group Reports</li>
+
+<li>Internal Communication Hub</li>
 
 </ul>
 

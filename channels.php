@@ -19,13 +19,13 @@ if(isset($_POST['save_channel']))
 {
 
     $channelCode =
-    'TCH-'.
+    'WCH-'.
     date('Ym').
     '-'.
     rand(1000,9999);
 
     $stmt = $pdo->prepare("
-    INSERT INTO telegram_channels
+    INSERT INTO whatsapp_channels
     (
 
     channel_code,
@@ -90,13 +90,13 @@ if(isset($_POST['save_channel']))
     ]);
 
     $message =
-    'Telegram Channel Created Successfully';
+    'WhatsApp Channel Created Successfully';
 
 }
 
 $channels = $pdo->query("
 SELECT *
-FROM telegram_channels
+FROM whatsapp_channels
 ORDER BY id DESC
 LIMIT 500
 ")->fetchAll();
@@ -109,7 +109,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Telegram Channel Management
+WhatsApp Channel Management
 
 </h3>
 
@@ -125,9 +125,9 @@ Telegram Channel Management
 
 <div class="card shadow">
 
-<div class="card-header bg-primary text-white">
+<div class="card-header bg-success text-white">
 
-Create Telegram Channel
+Create WhatsApp Channel
 
 </div>
 
@@ -206,13 +206,13 @@ readonly>
 
 <div class="col-md-12 mb-3">
 
-<label>Telegram Channel Link</label>
+<label>Channel Link</label>
 
 <input
 type="text"
 name="channel_link"
 class="form-control"
-placeholder="https://t.me/channelname">
+placeholder="https://whatsapp.com/channel/...">
 
 </div>
 
@@ -221,7 +221,7 @@ placeholder="https://t.me/channelname">
 <button
 type="submit"
 name="save_channel"
-class="btn btn-primary">
+class="btn btn-success">
 
 Create Channel
 
@@ -235,7 +235,7 @@ Create Channel
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-success text-white">
+<div class="card-header bg-primary text-white">
 
 Channel Register
 
@@ -315,9 +315,9 @@ Channel Workflow
 <pre>
 News Published
       ↓
-Telegram Channel
+WhatsApp Channel
       ↓
-Subscribers
+Subscriber Reach
       ↓
 Website Traffic
       ↓
@@ -340,29 +340,29 @@ Channel Features
 
 <ul>
 
-<li>Telegram Channel Management</li>
+<li>WhatsApp Channel Management</li>
 
 <li>District Wise Channels</li>
 
-<li>News Channels</li>
+<li>News Distribution</li>
 
 <li>Breaking News Channels</li>
 
-<li>Subscriber Tracking</li>
-
 <li>Auto Posting</li>
 
-<li>Channel Analytics</li>
+<li>Subscriber Tracking</li>
+
+<li>Growth Analytics</li>
+
+<li>Performance Reports</li>
 
 <li>Traffic Monitoring</li>
 
-<li>Growth Reports</li>
-
-<li>Channel Archive</li>
+<li>Channel Categories</li>
 
 <li>Engagement Reports</li>
 
-<li>Multi Channel Distribution</li>
+<li>Channel Archive</li>
 
 </ul>
 

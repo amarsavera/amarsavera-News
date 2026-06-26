@@ -15,27 +15,27 @@ if(!isset($_SESSION['admin_id']))
 
 $totalChannels = $pdo->query("
 SELECT COUNT(*)
-FROM telegram_channels
+FROM whatsapp_channels
 ")->fetchColumn();
 
 $totalGroups = $pdo->query("
 SELECT COUNT(*)
-FROM telegram_groups
+FROM whatsapp_groups
 ")->fetchColumn();
 
 $totalSubscribers = $pdo->query("
 SELECT COUNT(*)
-FROM telegram_subscribers
+FROM whatsapp_subscribers
 ")->fetchColumn();
 
 $totalBroadcasts = $pdo->query("
 SELECT COUNT(*)
-FROM telegram_broadcasts
+FROM whatsapp_broadcasts
 ")->fetchColumn();
 
 $totalCampaigns = $pdo->query("
 SELECT COUNT(*)
-FROM telegram_campaigns
+FROM whatsapp_campaigns
 ")->fetchColumn();
 
 include '../layout/header.php';
@@ -46,7 +46,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Telegram Command Center
+WhatsApp Command Center
 
 </h3>
 
@@ -54,7 +54,7 @@ Telegram Command Center
 
 <div class="col-md-2">
 
-<div class="card border-primary">
+<div class="card border-success">
 
 <div class="card-body text-center">
 
@@ -70,7 +70,7 @@ Telegram Command Center
 
 <div class="col-md-2">
 
-<div class="card border-success">
+<div class="card border-primary">
 
 <div class="card-body text-center">
 
@@ -136,9 +136,9 @@ Telegram Command Center
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-primary text-white">
+<div class="card-header bg-success text-white">
 
-Telegram Control Panel
+WhatsApp Control Panel
 
 </div>
 
@@ -149,7 +149,7 @@ Telegram Control Panel
 <div class="col-md-3 mb-2">
 
 <a href="channels.php"
-class="btn btn-primary w-100">
+class="btn btn-success w-100">
 
 Channels
 
@@ -160,7 +160,7 @@ Channels
 <div class="col-md-3 mb-2">
 
 <a href="groups.php"
-class="btn btn-success w-100">
+class="btn btn-primary w-100">
 
 Groups
 
@@ -198,9 +198,9 @@ Subscribers
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-success text-white">
+<div class="card-header bg-primary text-white">
 
-Telegram Workflow
+WhatsApp Workflow
 
 </div>
 
@@ -209,15 +209,15 @@ Telegram Workflow
 <pre>
 News Published
       ↓
-Telegram Channel
+WhatsApp Channel
       ↓
-Telegram Groups
+District Groups
+      ↓
+Broadcast Lists
       ↓
 Subscribers
       ↓
 Website Traffic
-      ↓
-Analytics
 </pre>
 
 </div>
@@ -236,13 +236,15 @@ Features
 
 <ul>
 
-<li>Telegram Channel Management</li>
+<li>WhatsApp Channel Management</li>
 
-<li>Telegram Group Management</li>
+<li>District Group Management</li>
 
-<li>News Broadcasting</li>
+<li>Reporter Groups</li>
 
-<li>Subscriber Tracking</li>
+<li>Broadcast Lists</li>
+
+<li>Subscriber Management</li>
 
 <li>Auto News Sharing</li>
 
@@ -250,15 +252,13 @@ Features
 
 <li>Campaign Management</li>
 
-<li>Automation System</li>
+<li>Automation Tools</li>
 
-<li>Engagement Analytics</li>
+<li>Analytics Dashboard</li>
 
 <li>Delivery Reports</li>
 
 <li>Growth Tracking</li>
-
-<li>Multi Channel Distribution</li>
 
 </ul>
 

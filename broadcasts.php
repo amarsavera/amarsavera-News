@@ -19,13 +19,13 @@ if(isset($_POST['save_broadcast']))
 {
 
     $broadcastCode =
-    'TBC-'.
+    'WBC-'.
     date('Ym').
     '-'.
     rand(1000,9999);
 
     $stmt = $pdo->prepare("
-    INSERT INTO telegram_broadcasts
+    INSERT INTO whatsapp_broadcasts
     (
 
     broadcast_code,
@@ -36,7 +36,7 @@ if(isset($_POST['save_broadcast']))
 
     broadcast_type,
 
-    target_audience,
+    target_group,
 
     website_link,
 
@@ -83,7 +83,7 @@ if(isset($_POST['save_broadcast']))
 
         $_POST['broadcast_type'],
 
-        $_POST['target_audience'],
+        $_POST['target_group'],
 
         $_POST['website_link'],
 
@@ -92,13 +92,13 @@ if(isset($_POST['save_broadcast']))
     ]);
 
     $message =
-    'Telegram Broadcast Created Successfully';
+    'Broadcast Created Successfully';
 
 }
 
 $broadcasts = $pdo->query("
 SELECT *
-FROM telegram_broadcasts
+FROM whatsapp_broadcasts
 ORDER BY id DESC
 LIMIT 500
 ")->fetchAll();
@@ -111,7 +111,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Telegram Broadcast Center
+WhatsApp Broadcast Center
 
 </h3>
 
@@ -127,7 +127,7 @@ Telegram Broadcast Center
 
 <div class="card shadow">
 
-<div class="card-header bg-primary text-white">
+<div class="card-header bg-success text-white">
 
 Create Broadcast
 
@@ -167,8 +167,8 @@ News
 Breaking News
 </option>
 
-<option value="video">
-Video Update
+<option value="advertisement">
+Advertisement
 </option>
 
 <option value="campaign">
@@ -188,23 +188,27 @@ Emergency Alert
 <label>Target Audience</label>
 
 <select
-name="target_audience"
+name="target_group"
 class="form-control">
 
 <option value="all">
 All Subscribers
 </option>
 
-<option value="channels">
-Channel Subscribers
-</option>
-
-<option value="groups">
-Telegram Groups
+<option value="state">
+State Groups
 </option>
 
 <option value="district">
-District Audience
+District Groups
+</option>
+
+<option value="reporters">
+Reporter Groups
+</option>
+
+<option value="channels">
+Channel Followers
 </option>
 
 </select>
@@ -213,7 +217,7 @@ District Audience
 
 <div class="col-md-12 mb-3">
 
-<label>Broadcast Message</label>
+<label>Message</label>
 
 <textarea
 name="message_text"
@@ -240,7 +244,7 @@ placeholder="https://amar-savera.saragone.in">
 <button
 type="submit"
 name="save_broadcast"
-class="btn btn-primary">
+class="btn btn-success">
 
 Create Broadcast
 
@@ -254,7 +258,7 @@ Create Broadcast
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-success text-white">
+<div class="card-header bg-primary text-white">
 
 Broadcast Register
 
@@ -273,7 +277,7 @@ Broadcast Register
 <th>Code</th>
 <th>Title</th>
 <th>Type</th>
-<th>Audience</th>
+<th>Target</th>
 <th>Status</th>
 
 </tr>
@@ -292,7 +296,7 @@ Broadcast Register
 
 <td><?= ucfirst($broadcast['broadcast_type']); ?></td>
 
-<td><?= ucfirst($broadcast['target_audience']); ?></td>
+<td><?= ucfirst($broadcast['target_group']); ?></td>
 
 <td>
 
@@ -331,7 +335,9 @@ Broadcast Workflow
 <pre>
 Breaking News
       ↓
-Telegram Broadcast
+Broadcast Created
+      ↓
+WhatsApp Delivery
       ↓
 Subscribers Receive
       ↓
@@ -356,29 +362,29 @@ Broadcast Features
 
 <ul>
 
-<li>Telegram News Broadcast</li>
+<li>News Broadcast System</li>
 
-<li>Breaking News Alerts</li>
+<li>Breaking News Broadcast</li>
+
+<li>District Wise Broadcast</li>
 
 <li>Scheduled Broadcasts</li>
 
-<li>Channel Broadcasts</li>
+<li>Bulk Message Sending</li>
 
-<li>Group Broadcasts</li>
+<li>Website Link Sharing</li>
 
-<li>Media Sharing</li>
+<li>Media Attachment Support</li>
 
 <li>Delivery Tracking</li>
 
-<li>Click Tracking</li>
-
-<li>Traffic Analytics</li>
+<li>Read Tracking</li>
 
 <li>Broadcast Reports</li>
 
-<li>Website Promotion</li>
+<li>Traffic Generation</li>
 
-<li>Campaign Distribution</li>
+<li>Campaign Broadcasting</li>
 
 </ul>
 
