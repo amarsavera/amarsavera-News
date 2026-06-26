@@ -9,46 +9,114 @@ if(session_status()===PHP_SESSION_NONE)
 
 if(!isset($_SESSION['admin_id']))
 {
-    header("Location: ../index.php");
+    header("Location: ../index.php');
     exit;
 }
 
+$employeeCode =
+$_SESSION['employee_code'] ?? '';
+
+$month = date('m');
+$year  = date('Y');
+
 /*
 |--------------------------------------------------------------------------
-| Recruitment Dashboard Statistics
+| News Target
 |--------------------------------------------------------------------------
 */
 
-$totalVacancies = $pdo->query("
-SELECT COUNT(*)
-FROM recruitment_vacancies
-")->fetchColumn();
+$target = $pdo->prepare("
+SELECT *
+FROM hrms_targets
+WHERE employee_code=?
+AND target_month=?
+AND target_year=?
+LIMIT 1
+");
 
-$totalApplications = $pdo->query("
-SELECT COUNT(*)
-FROM recruitment_applications
-")->fetchColumn();
+$target->execute([
+$employeeCode,
+$month,
+$year
+]);
 
-$totalInterviews = $pdo->query("
-SELECT COUNT(*)
-FROM recruitment_interviews
-")->fetchColumn();
+$targetData =
+$target->fetch();
 
-$totalSelected = $pdo->query("
-SELECT COUNT(*)
-FROM recruitment_applications
-WHERE application_status='selected'
-")->fetchColumn();
+/*
+|--------------------------------------------------------------------------
+| News Count
+|--------------------------------------------------------------------------
+*/
 
-$totalTraining = $pdo->query("
+$newsCount = $pdo->prepare("
 SELECT COUNT(*)
-FROM recruitment_training
-")->fetchColumn();
+FROM news
+WHERE reporter_code=?
+AND MONTH(created_at)=?
+AND YEAR(created_at)=?
+");
 
-$totalJoined = $pdo->query("
-SELECT COUNT(*)
-FROM employees
-")->fetchColumn();
+$newsCount->execute([
+
+$employeeCode,
+$month,
+$year
+
+]);
+
+$totalNews =
+$newsCount->fetchColumn();
+
+/*
+|--------------------------------------------------------------------------
+| Advertisement Revenue
+|--------------------------------------------------------------------------
+*/
+
+$adsRevenue = $pdo->prepare("
+SELECT IFNULL(SUM(total_amount),0)
+FROM advertisement_bookings
+WHERE executive_code=?
+AND MONTH(created_at)=?
+AND YEAR(created_at)=?
+");
+
+$adsRevenue->execute([
+
+$employeeCode,
+$month,
+$year
+
+]);
+
+$totalAdsRevenue =
+$adsRevenue->fetchColumn();
+
+/*
+|--------------------------------------------------------------------------
+| Collections
+|--------------------------------------------------------------------------
+*/
+
+$collection = $pdo->prepare("
+SELECT IFNULL(SUM(payment_amount),0)
+FROM payment_transactions
+WHERE executive_code=?
+AND MONTH(payment_date)=?
+AND YEAR(payment_date)=?
+");
+
+$collection->execute([
+
+$employeeCode,
+$month,
+$year
+
+]);
+
+$totalCollection =
+$collection->fetchColumn();
 
 include '../layout/header.php';
 
@@ -58,37 +126,29 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Recruitment Management Dashboard
+Reporter Dashboard
 
 </h3>
 
 <div class="row">
 
-<div class="col-md-2">
+<div class="col-md-3">
 
 <div class="card border-primary">
 
 <div class="card-body text-center">
 
-<h4><?= number_format($totalVacancies); ?></h4>
+<h2>
 
-<p>Vacancies</p>
+<?= $totalNews; ?>
 
-</div>
+</h2>
 
-</div>
+<p>
 
-</div>
+News Published
 
-<div class="col-md-2">
-
-<div class="card border-warning">
-
-<div class="card-body text-center">
-
-<h4><?= number_format($totalApplications); ?></h4>
-
-<p>Applications</p>
+</p>
 
 </div>
 
@@ -96,31 +156,23 @@ Recruitment Management Dashboard
 
 </div>
 
-<div class="col-md-2">
-
-<div class="card border-info">
-
-<div class="card-body text-center">
-
-<h4><?= number_format($totalInterviews); ?></h4>
-
-<p>Interviews</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-2">
+<div class="col-md-3">
 
 <div class="card border-success">
 
 <div class="card-body text-center">
 
-<h4><?= number_format($totalSelected); ?></h4>
+<h2>
 
-<p>Selected</p>
+₹<?= number_format($totalAdsRevenue); ?>
+
+</h2>
+
+<p>
+
+Advertisement Revenue
+
+</p>
 
 </div>
 
@@ -128,15 +180,23 @@ Recruitment Management Dashboard
 
 </div>
 
-<div class="col-md-2">
+<div class="col-md-3">
 
-<div class="card border-dark">
+<div class="card border-warning">
 
 <div class="card-body text-center">
 
-<h4><?= number_format($totalTraining); ?></h4>
+<h2>
 
-<p>Training</p>
+₹<?= number_format($totalCollection); ?>
+
+</h2>
+
+<p>
+
+Collections
+
+</p>
 
 </div>
 
@@ -144,77 +204,23 @@ Recruitment Management Dashboard
 
 </div>
 
-<div class="col-md-2">
+<div class="col-md-3">
 
 <div class="card border-danger">
 
 <div class="card-body text-center">
 
-<h4><?= number_format($totalJoined); ?></h4>
+<h2>
 
-<p>Joined</p>
+<?= $targetData['achievement_percentage'] ?? 0; ?>%
 
-</div>
+</h2>
 
-</div>
+<p>
 
-</div>
+Overall Achievement
 
-</div>
-
-<div class="card shadow mt-4">
-
-<div class="card-header bg-primary text-white">
-
-Recruitment Control Center
-
-</div>
-
-<div class="card-body">
-
-<div class="row">
-
-<div class="col-md-3 mb-2">
-
-<a href="vacancies.php"
-class="btn btn-primary w-100">
-
-Vacancies
-
-</a>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<a href="applications.php"
-class="btn btn-warning w-100">
-
-Applications
-
-</a>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<a href="interviews.php"
-class="btn btn-info w-100">
-
-Interviews
-
-</a>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<a href="joining.php"
-class="btn btn-success w-100">
-
-Joining
-
-</a>
+</p>
 
 </div>
 
@@ -228,29 +234,75 @@ Joining
 
 <div class="card-header bg-success text-white">
 
-Recruitment Workflow
+Current Month Target
 
 </div>
 
 <div class="card-body">
 
-<pre>
-Application Received
-         ↓
-Screening
-         ↓
-Interview
-         ↓
-Selection
-         ↓
-7 Days Training
-         ↓
-ID Card & Authority Letter
-         ↓
-Joining
-         ↓
-Active Reporter
-</pre>
+<table class="table table-bordered">
+
+<tr>
+
+<th>News Target</th>
+
+<td>
+
+<?= $targetData['news_target'] ?? 0; ?>
+
+</td>
+
+<th>Achieved</th>
+
+<td>
+
+<?= $targetData['news_achieved'] ?? 0; ?>
+
+</td>
+
+</tr>
+
+<tr>
+
+<th>Advertisement Target</th>
+
+<td>
+
+<?= $targetData['advertisement_target'] ?? 0; ?>
+
+</td>
+
+<th>Achieved</th>
+
+<td>
+
+<?= $targetData['advertisement_achieved'] ?? 0; ?>
+
+</td>
+
+</tr>
+
+<tr>
+
+<th>Collection Target</th>
+
+<td>
+
+<?= $targetData['collection_target'] ?? 0; ?>
+
+</td>
+
+<th>Achieved</th>
+
+<td>
+
+<?= $targetData['collection_achieved'] ?? 0; ?>
+
+</td>
+
+</tr>
+
+</table>
 
 </div>
 
@@ -258,41 +310,53 @@ Active Reporter
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-info text-white">
+<div class="card-header bg-dark text-white">
 
-Recruitment Features
+Quick Actions
 
 </div>
 
 <div class="card-body">
 
-<ul>
+<a
+href="assignments.php"
+class="btn btn-primary">
 
-<li>Journalist Recruitment</li>
+Assignments
 
-<li>District Reporter Recruitment</li>
+</a>
 
-<li>Bureau Chief Recruitment</li>
+<a
+href="my-news.php"
+class="btn btn-success">
 
-<li>Photographer Recruitment</li>
+My News
 
-<li>Interview Scheduling</li>
+</a>
 
-<li>Training Management</li>
+<a
+href="performance.php"
+class="btn btn-warning">
 
-<li>ID Card Generation</li>
+Performance
 
-<li>Authority Letter Generation</li>
+</a>
 
-<li>Official Email Creation</li>
+<a
+href="wallet.php"
+class="btn btn-info">
 
-<li>HRMS Integration</li>
+Wallet
 
-<li>Employee ID Generation</li>
+</a>
 
-<li>Performance Tracking</li>
+<a
+href="incentives.php"
+class="btn btn-dark">
 
-</ul>
+Incentives
+
+</a>
 
 </div>
 

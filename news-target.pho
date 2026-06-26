@@ -1,0 +1,383 @@
+<?php
+
+require_once '../../includes/config.php';
+
+if(session_status()===PHP_SESSION_NONE)
+{
+    session_start();
+}
+
+if(!isset($_SESSION['admin_id']))
+{
+    header("Location: ../index.php");
+    exit;
+}
+
+$employeeCode =
+$_SESSION['employee_code'] ?? '';
+
+$currentMonth = date('m');
+$currentYear  = date('Y');
+
+$stmt = $pdo->prepare("
+SELECT *
+FROM hrms_targets
+WHERE employee_code=?
+AND target_month=?
+AND target_year=?
+LIMIT 1
+");
+
+$stmt->execute([
+
+$employeeCode,
+$currentMonth,
+$currentYear
+
+]);
+
+$target = $stmt->fetch();
+
+$newsCount = $pdo->prepare("
+SELECT COUNT(*)
+FROM news
+WHERE reporter_code=?
+AND status='published'
+AND MONTH(published_at)=?
+AND YEAR(published_at)=?
+");
+
+$newsCount->execute([
+
+$employeeCode,
+$currentMonth,
+$currentYear
+
+]);
+
+$publishedNews =
+$newsCount->fetchColumn();
+
+$dailyAverage = 0;
+
+if(date('d')>0)
+{
+    $dailyAverage =
+    round(
+    $publishedNews/date('d'),
+    2
+    );
+}
+
+include '../layout/header.php';
+
+?>
+
+<div class="container-fluid">
+
+<h3 class="mb-4">
+
+News Target Dashboard
+
+</h3>
+
+<div class="row">
+
+<div class="col-md-3">
+
+<div class="card border-primary">
+
+<div class="card-body text-center">
+
+<h2>
+
+<?= $target['news_target'] ?? 0; ?>
+
+</h2>
+
+<p>
+
+Monthly Target
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card border-success">
+
+<div class="card-body text-center">
+
+<h2>
+
+<?= $publishedNews; ?>
+
+</h2>
+
+<p>
+
+Published News
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card border-warning">
+
+<div class="card-body text-center">
+
+<h2>
+
+<?= $dailyAverage; ?>
+
+</h2>
+
+<p>
+
+Daily Average
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card border-danger">
+
+<div class="card-body text-center">
+
+<h2>
+
+<?= $target['achievement_percentage'] ?? 0; ?>%
+
+</h2>
+
+<p>
+
+Achievement
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card shadow mt-4">
+
+<div class="card-header bg-success text-white">
+
+Target Progress
+
+</div>
+
+<div class="card-body">
+
+<?php
+
+$targetValue =
+$target['news_target'] ?? 0;
+
+$achievement =
+0;
+
+if($targetValue>0)
+{
+    $achievement =
+    round(
+    ($publishedNews/$targetValue)*100,
+    2
+    );
+}
+
+?>
+
+<div class="progress mb-3" style="height:30px;">
+
+<div
+class="progress-bar bg-success"
+style="width:<?= min($achievement,100); ?>%">
+
+<?= $achievement; ?>%
+
+</div>
+
+</div>
+
+<table class="table table-bordered">
+
+<tr>
+
+<th width="250">
+
+Target
+
+</th>
+
+<td>
+
+<?= $targetValue; ?>
+
+</td>
+
+</tr>
+
+<tr>
+
+<th>
+
+Achieved
+
+</th>
+
+<td>
+
+<?= $publishedNews; ?>
+
+</td>
+
+</tr>
+
+<tr>
+
+<th>
+
+Remaining
+
+</th>
+
+<td>
+
+<?= max(
+0,
+$targetValue-$publishedNews
+); ?>
+
+</td>
+
+</tr>
+
+<tr>
+
+<th>
+
+Completion %
+
+</th>
+
+<td>
+
+<?= $achievement; ?>%
+
+</td>
+
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="card shadow mt-4">
+
+<div class="card-header bg-primary text-white">
+
+District Ranking
+
+</div>
+
+<div class="card-body">
+
+<table class="table table-bordered">
+
+<thead>
+
+<tr>
+
+<th>Rank</th>
+<th>Reporter</th>
+<th>Achievement %</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<?php
+
+$ranking = $pdo->query("
+SELECT
+
+employee_name,
+achievement_percentage
+
+FROM hrms_targets
+
+ORDER BY achievement_percentage DESC
+
+LIMIT 10
+")->fetchAll();
+
+$rank = 1;
+
+foreach($ranking as $row):
+
+?>
+
+<tr>
+
+<td>
+
+<?= $rank++; ?>
+
+</td>
+
+<td>
+
+<?= htmlspecialchars(
+$row['employee_name']
+); ?>
+
+</td>
+
+<td>
+
+<?= $row['achievement_percentage']; ?>%
+
+</td>
+
+</tr>
+
+<?php endforeach; ?>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<?php include '../layout/footer.php'; ?>
