@@ -15,27 +15,27 @@ if(!isset($_SESSION['admin_id']))
 
 $totalChannels = $pdo->query("
 SELECT COUNT(*)
-FROM whatsapp_channels
+FROM youtube_channels
 ")->fetchColumn();
 
-$totalGroups = $pdo->query("
+$totalVideos = $pdo->query("
 SELECT COUNT(*)
-FROM whatsapp_groups
+FROM youtube_videos
+")->fetchColumn();
+
+$totalLiveStreams = $pdo->query("
+SELECT COUNT(*)
+FROM youtube_live_streams
 ")->fetchColumn();
 
 $totalSubscribers = $pdo->query("
 SELECT COUNT(*)
-FROM whatsapp_subscribers
+FROM youtube_subscribers
 ")->fetchColumn();
 
-$totalBroadcasts = $pdo->query("
+$totalPlaylists = $pdo->query("
 SELECT COUNT(*)
-FROM whatsapp_broadcasts
-")->fetchColumn();
-
-$totalCampaigns = $pdo->query("
-SELECT COUNT(*)
-FROM whatsapp_campaigns
+FROM youtube_playlists
 ")->fetchColumn();
 
 include '../layout/header.php';
@@ -46,7 +46,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-WhatsApp Command Center
+YouTube Command Center
 
 </h3>
 
@@ -54,7 +54,7 @@ WhatsApp Command Center
 
 <div class="col-md-2">
 
-<div class="card border-success">
+<div class="card border-danger">
 
 <div class="card-body text-center">
 
@@ -74,9 +74,9 @@ WhatsApp Command Center
 
 <div class="card-body text-center">
 
-<h4><?= $totalGroups; ?></h4>
+<h4><?= $totalVideos; ?></h4>
 
-<p>Groups</p>
+<p>Videos</p>
 
 </div>
 
@@ -85,6 +85,22 @@ WhatsApp Command Center
 </div>
 
 <div class="col-md-3">
+
+<div class="card border-success">
+
+<div class="card-body text-center">
+
+<h4><?= $totalLiveStreams; ?></h4>
+
+<p>Live Streams</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-2">
 
 <div class="card border-warning">
 
@@ -100,31 +116,77 @@ WhatsApp Command Center
 
 </div>
 
-<div class="col-md-2">
-
-<div class="card border-danger">
-
-<div class="card-body text-center">
-
-<h4><?= $totalBroadcasts; ?></h4>
-
-<p>Broadcasts</p>
-
-</div>
-
-</div>
-
-</div>
-
 <div class="col-md-3">
 
 <div class="card border-info">
 
 <div class="card-body text-center">
 
-<h4><?= $totalCampaigns; ?></h4>
+<h4><?= $totalPlaylists; ?></h4>
 
-<p>Campaigns</p>
+<p>Playlists</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card shadow mt-4">
+
+<div class="card-header bg-danger text-white">
+
+YouTube Control Panel
+
+</div>
+
+<div class="card-body">
+
+<div class="row">
+
+<div class="col-md-3 mb-2">
+
+<a href="channels.php"
+class="btn btn-danger w-100">
+
+Channels
+
+</a>
+
+</div>
+
+<div class="col-md-3 mb-2">
+
+<a href="videos.php"
+class="btn btn-primary w-100">
+
+Videos
+
+</a>
+
+</div>
+
+<div class="col-md-3 mb-2">
+
+<a href="live-streams.php"
+class="btn btn-success w-100">
+
+Live Streams
+
+</a>
+
+</div>
+
+<div class="col-md-3 mb-2">
+
+<a href="analytics.php"
+class="btn btn-warning w-100">
+
+Analytics
+
+</a>
 
 </div>
 
@@ -138,86 +200,24 @@ WhatsApp Command Center
 
 <div class="card-header bg-success text-white">
 
-WhatsApp Control Panel
-
-</div>
-
-<div class="card-body">
-
-<div class="row">
-
-<div class="col-md-3 mb-2">
-
-<a href="channels.php"
-class="btn btn-success w-100">
-
-Channels
-
-</a>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<a href="groups.php"
-class="btn btn-primary w-100">
-
-Groups
-
-</a>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<a href="broadcasts.php"
-class="btn btn-danger w-100">
-
-Broadcasts
-
-</a>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<a href="subscribers.php"
-class="btn btn-warning w-100">
-
-Subscribers
-
-</a>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="card shadow mt-4">
-
-<div class="card-header bg-primary text-white">
-
-WhatsApp Workflow
+YouTube Workflow
 
 </div>
 
 <div class="card-body">
 
 <pre>
-News Published
+News Coverage
       ↓
-WhatsApp Channel
+Video Production
       ↓
-District Groups
-      ↓
-Broadcast Lists
+YouTube Upload
       ↓
 Subscribers
       ↓
-Website Traffic
+Revenue
+      ↓
+Analytics
 </pre>
 
 </div>
@@ -236,29 +236,29 @@ Features
 
 <ul>
 
-<li>WhatsApp Channel Management</li>
+<li>YouTube Channel Management</li>
 
-<li>District Group Management</li>
+<li>Video Publishing</li>
 
-<li>Reporter Groups</li>
+<li>Live Streaming</li>
 
-<li>Broadcast Lists</li>
+<li>Playlist Management</li>
 
-<li>Subscriber Management</li>
+<li>Subscriber Tracking</li>
 
-<li>Auto News Sharing</li>
+<li>Monetization Tracking</li>
 
-<li>Traffic Generation</li>
+<li>Watch Time Analytics</li>
 
-<li>Campaign Management</li>
+<li>Revenue Analytics</li>
 
-<li>Automation Tools</li>
+<li>SEO Optimization</li>
 
-<li>Analytics Dashboard</li>
+<li>Thumbnail Management</li>
 
-<li>Delivery Reports</li>
+<li>Content Scheduling</li>
 
-<li>Growth Tracking</li>
+<li>Performance Reports</li>
 
 </ul>
 

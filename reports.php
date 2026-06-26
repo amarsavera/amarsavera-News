@@ -15,32 +15,32 @@ if(!isset($_SESSION['admin_id']))
 
 $totalChannels = $pdo->query("
 SELECT COUNT(*)
-FROM whatsapp_channels
+FROM youtube_channels
 ")->fetchColumn();
 
-$totalGroups = $pdo->query("
+$totalVideos = $pdo->query("
 SELECT COUNT(*)
-FROM whatsapp_groups
+FROM youtube_videos
 ")->fetchColumn();
 
 $totalSubscribers = $pdo->query("
 SELECT COUNT(*)
-FROM whatsapp_subscribers
+FROM youtube_subscribers
 ")->fetchColumn();
 
-$totalBroadcasts = $pdo->query("
+$totalLiveStreams = $pdo->query("
 SELECT COUNT(*)
-FROM whatsapp_broadcasts
+FROM youtube_live_streams
 ")->fetchColumn();
 
-$totalCampaigns = $pdo->query("
-SELECT COUNT(*)
-FROM whatsapp_campaigns
+$totalViews = $pdo->query("
+SELECT COALESCE(SUM(views),0)
+FROM youtube_videos
 ")->fetchColumn();
 
-$totalAutomations = $pdo->query("
-SELECT COUNT(*)
-FROM whatsapp_automation
+$totalWatchTime = $pdo->query("
+SELECT COALESCE(SUM(watch_time),0)
+FROM youtube_videos
 ")->fetchColumn();
 
 include '../layout/header.php';
@@ -51,7 +51,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-WhatsApp Reports & Analytics
+YouTube Reports & Analytics
 
 </h3>
 
@@ -59,7 +59,7 @@ WhatsApp Reports & Analytics
 
 <div class="col-md-2">
 
-<div class="card border-success">
+<div class="card border-danger">
 
 <div class="card-body text-center">
 
@@ -79,9 +79,9 @@ WhatsApp Reports & Analytics
 
 <div class="card-body text-center">
 
-<h4><?= number_format($totalGroups); ?></h4>
+<h4><?= number_format($totalVideos); ?></h4>
 
-<p>Groups</p>
+<p>Videos</p>
 
 </div>
 
@@ -91,7 +91,7 @@ WhatsApp Reports & Analytics
 
 <div class="col-md-2">
 
-<div class="card border-warning">
+<div class="card border-success">
 
 <div class="card-body text-center">
 
@@ -105,47 +105,31 @@ WhatsApp Reports & Analytics
 
 </div>
 
-<div class="col-md-2">
+<div class="col-md-3">
 
-<div class="card border-danger">
+<div class="card border-warning">
 
 <div class="card-body text-center">
 
-<h4><?= number_format($totalBroadcasts); ?></h4>
+<h4><?= number_format($totalViews); ?></h4>
 
-<p>Broadcasts</p>
-
-</div>
+<p>Total Views</p>
 
 </div>
 
 </div>
 
-<div class="col-md-2">
+</div>
+
+<div class="col-md-3">
 
 <div class="card border-info">
 
 <div class="card-body text-center">
 
-<h4><?= number_format($totalCampaigns); ?></h4>
+<h4><?= number_format($totalWatchTime); ?></h4>
 
-<p>Campaigns</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-2">
-
-<div class="card border-dark">
-
-<div class="card-body text-center">
-
-<h4><?= number_format($totalAutomations); ?></h4>
-
-<p>Automation</p>
+<p>Watch Time</p>
 
 </div>
 
@@ -157,9 +141,9 @@ WhatsApp Reports & Analytics
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-success text-white">
+<div class="card-header bg-danger text-white">
 
-WhatsApp Summary Report
+YouTube Summary Report
 
 </div>
 
@@ -173,8 +157,8 @@ WhatsApp Summary Report
 </tr>
 
 <tr>
-<th>Total Groups</th>
-<td><?= number_format($totalGroups); ?></td>
+<th>Total Videos</th>
+<td><?= number_format($totalVideos); ?></td>
 </tr>
 
 <tr>
@@ -183,18 +167,18 @@ WhatsApp Summary Report
 </tr>
 
 <tr>
-<th>Total Broadcasts</th>
-<td><?= number_format($totalBroadcasts); ?></td>
+<th>Total Live Streams</th>
+<td><?= number_format($totalLiveStreams); ?></td>
 </tr>
 
 <tr>
-<th>Total Campaigns</th>
-<td><?= number_format($totalCampaigns); ?></td>
+<th>Total Views</th>
+<td><?= number_format($totalViews); ?></td>
 </tr>
 
 <tr>
-<th>Total Automations</th>
-<td><?= number_format($totalAutomations); ?></td>
+<th>Total Watch Time</th>
+<td><?= number_format($totalWatchTime); ?> Minutes</td>
 </tr>
 
 </table>
@@ -205,7 +189,7 @@ WhatsApp Summary Report
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-primary text-white">
+<div class="card-header bg-success text-white">
 
 Available Reports
 
@@ -218,7 +202,7 @@ Available Reports
 <div class="col-md-2 mb-2">
 
 <a href="channel-report.php"
-class="btn btn-success w-100">
+class="btn btn-danger w-100">
 
 Channels
 
@@ -228,10 +212,21 @@ Channels
 
 <div class="col-md-2 mb-2">
 
-<a href="group-report.php"
+<a href="video-report.php"
 class="btn btn-primary w-100">
 
-Groups
+Videos
+
+</a>
+
+</div>
+
+<div class="col-md-2 mb-2">
+
+<a href="livestream-report.php"
+class="btn btn-success w-100">
+
+Live Streams
 
 </a>
 
@@ -250,21 +245,10 @@ Subscribers
 
 <div class="col-md-2 mb-2">
 
-<a href="broadcast-report.php"
-class="btn btn-danger w-100">
-
-Broadcasts
-
-</a>
-
-</div>
-
-<div class="col-md-2 mb-2">
-
-<a href="campaign-report.php"
+<a href="revenue-report.php"
 class="btn btn-info w-100">
 
-Campaigns
+Revenue
 
 </a>
 
@@ -272,10 +256,10 @@ Campaigns
 
 <div class="col-md-2 mb-2">
 
-<a href="analytics-report.php"
+<a href="watchtime-report.php"
 class="btn btn-dark w-100">
 
-Analytics
+Watch Time
 
 </a>
 
@@ -291,23 +275,23 @@ Analytics
 
 <div class="card-header bg-warning text-dark">
 
-WhatsApp Reports Workflow
+Reports Workflow
 
 </div>
 
 <div class="card-body">
 
 <pre>
-News Distribution
-        ↓
-Delivery Tracking
-        ↓
-Subscriber Engagement
-        ↓
-Website Traffic
-        ↓
+Content Published
+       ↓
+Views & Watch Time
+       ↓
+Subscribers Growth
+       ↓
+Revenue
+       ↓
 Analytics
-        ↓
+       ↓
 Reports
 </pre>
 
@@ -329,27 +313,27 @@ Reports Features
 
 <li>Channel Reports</li>
 
-<li>Group Reports</li>
+<li>Video Reports</li>
 
-<li>Broadcast Reports</li>
+<li>Live Stream Reports</li>
 
 <li>Subscriber Reports</li>
 
-<li>Campaign Reports</li>
+<li>Revenue Reports</li>
 
-<li>Delivery Analytics</li>
+<li>Watch Time Reports</li>
 
-<li>Click Analytics</li>
-
-<li>Traffic Analytics</li>
+<li>Monetization Reports</li>
 
 <li>Growth Reports</li>
-
-<li>Engagement Reports</li>
 
 <li>PDF Export</li>
 
 <li>Excel Export</li>
+
+<li>Performance Reports</li>
+
+<li>Executive Dashboard Reports</li>
 
 </ul>
 

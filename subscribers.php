@@ -19,28 +19,30 @@ if(isset($_POST['save_subscriber']))
 {
 
     $subscriberCode =
-    'SUB-'.
+    'YTSUB-'.
     date('Ym').
     '-'.
     rand(1000,9999);
 
     $stmt = $pdo->prepare("
-    INSERT INTO whatsapp_subscribers
+    INSERT INTO youtube_subscribers
     (
 
     subscriber_code,
 
-    full_name,
+    subscriber_name,
 
-    mobile_number,
-
-    district,
+    channel_name,
 
     source,
 
+    district,
+
+    engagement_level,
+
     status,
 
-    joined_date,
+    subscribed_at,
 
     created_by
 
@@ -48,6 +50,8 @@ if(isset($_POST['save_subscriber']))
 
     VALUES
     (
+
+    ?,
 
     ?,
 
@@ -73,13 +77,15 @@ if(isset($_POST['save_subscriber']))
 
         $subscriberCode,
 
-        $_POST['full_name'],
+        $_POST['subscriber_name'],
 
-        $_POST['mobile_number'],
+        $_POST['channel_name'],
+
+        $_POST['source'],
 
         $_POST['district'],
 
-        $_POST['source'],
+        $_POST['engagement_level'],
 
         $_SESSION['admin_id']
 
@@ -92,7 +98,7 @@ if(isset($_POST['save_subscriber']))
 
 $subscribers = $pdo->query("
 SELECT *
-FROM whatsapp_subscribers
+FROM youtube_subscribers
 ORDER BY id DESC
 LIMIT 500
 ")->fetchAll();
@@ -105,7 +111,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Subscriber Management
+YouTube Subscriber Management
 
 </h3>
 
@@ -121,7 +127,7 @@ Subscriber Management
 
 <div class="card shadow">
 
-<div class="card-header bg-success text-white">
+<div class="card-header bg-danger text-white">
 
 Add Subscriber
 
@@ -135,11 +141,11 @@ Add Subscriber
 
 <div class="col-md-3 mb-3">
 
-<label>Full Name</label>
+<label>Subscriber Name</label>
 
 <input
 type="text"
-name="full_name"
+name="subscriber_name"
 class="form-control"
 required>
 
@@ -147,17 +153,49 @@ required>
 
 <div class="col-md-3 mb-3">
 
-<label>Mobile Number</label>
+<label>Channel Name</label>
 
 <input
 type="text"
-name="mobile_number"
+name="channel_name"
 class="form-control"
 required>
 
 </div>
 
-<div class="col-md-3 mb-3">
+<div class="col-md-2 mb-3">
+
+<label>Source</label>
+
+<select
+name="source"
+class="form-control">
+
+<option value="youtube_search">
+YouTube Search
+</option>
+
+<option value="shorts">
+Shorts
+</option>
+
+<option value="suggested_videos">
+Suggested Videos
+</option>
+
+<option value="external_link">
+External Link
+</option>
+
+<option value="social_media">
+Social Media
+</option>
+
+</select>
+
+</div>
+
+<div class="col-md-2 mb-3">
 
 <label>District</label>
 
@@ -168,36 +206,24 @@ class="form-control">
 
 </div>
 
-<div class="col-md-3 mb-3">
+<div class="col-md-2 mb-3">
 
-<label>Subscription Source</label>
+<label>Engagement</label>
 
 <select
-name="source"
+name="engagement_level"
 class="form-control">
 
-<option value="website">
-Website
+<option value="high">
+High
 </option>
 
-<option value="whatsapp_channel">
-WhatsApp Channel
+<option value="medium">
+Medium
 </option>
 
-<option value="facebook">
-Facebook
-</option>
-
-<option value="youtube">
-YouTube
-</option>
-
-<option value="instagram">
-Instagram
-</option>
-
-<option value="referral">
-Referral
+<option value="low">
+Low
 </option>
 
 </select>
@@ -209,7 +235,7 @@ Referral
 <button
 type="submit"
 name="save_subscriber"
-class="btn btn-success">
+class="btn btn-danger">
 
 Add Subscriber
 
@@ -223,7 +249,7 @@ Add Subscriber
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-primary text-white">
+<div class="card-header bg-success text-white">
 
 Subscriber Register
 
@@ -241,9 +267,9 @@ Subscriber Register
 
 <th>Code</th>
 <th>Name</th>
-<th>Mobile</th>
-<th>District</th>
+<th>Channel</th>
 <th>Source</th>
+<th>Engagement</th>
 <th>Status</th>
 
 </tr>
@@ -258,13 +284,21 @@ Subscriber Register
 
 <td><?= $subscriber['subscriber_code']; ?></td>
 
-<td><?= htmlspecialchars($subscriber['full_name']); ?></td>
+<td><?= htmlspecialchars($subscriber['subscriber_name']); ?></td>
 
-<td><?= htmlspecialchars($subscriber['mobile_number']); ?></td>
+<td><?= htmlspecialchars($subscriber['channel_name']); ?></td>
 
-<td><?= htmlspecialchars($subscriber['district']); ?></td>
+<td><?= ucwords(str_replace('_',' ',$subscriber['source'])); ?></td>
 
-<td><?= ucfirst($subscriber['source']); ?></td>
+<td>
+
+<span class="badge bg-info">
+
+<?= ucfirst($subscriber['engagement_level']); ?>
+
+</span>
+
+</td>
 
 <td>
 
@@ -301,17 +335,17 @@ Subscriber Workflow
 <div class="card-body">
 
 <pre>
-User Joins Channel
-        ↓
+Video Published
+      ↓
+Viewer Watches
+      ↓
 Subscriber Added
-        ↓
-News Delivered
-        ↓
-Website Visit
-        ↓
-Engagement Tracking
-        ↓
-Analytics
+      ↓
+Notifications Enabled
+      ↓
+Regular Audience
+      ↓
+Revenue Growth
 </pre>
 
 </div>
@@ -332,27 +366,27 @@ Subscriber Features
 
 <li>Subscriber Management</li>
 
-<li>WhatsApp Channel Subscribers</li>
-
-<li>District Wise Subscribers</li>
-
-<li>Active/Inactive Subscribers</li>
-
-<li>Subscription Source Tracking</li>
-
-<li>Import Subscribers</li>
-
-<li>Export Subscribers</li>
+<li>Channel Wise Subscribers</li>
 
 <li>Growth Tracking</li>
 
+<li>Subscriber Sources</li>
+
 <li>Subscriber Analytics</li>
 
-<li>Engagement Reports</li>
+<li>Engagement Tracking</li>
 
-<li>Audience Database</li>
+<li>Subscriber Demographics</li>
+
+<li>Watch Behavior Analysis</li>
+
+<li>Retention Analytics</li>
 
 <li>Subscriber Reports</li>
+
+<li>Audience Segmentation</li>
+
+<li>Growth Monitoring</li>
 
 </ul>
 

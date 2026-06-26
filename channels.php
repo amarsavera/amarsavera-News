@@ -19,13 +19,13 @@ if(isset($_POST['save_channel']))
 {
 
     $channelCode =
-    'WCH-'.
+    'YTCH-'.
     date('Ym').
     '-'.
     rand(1000,9999);
 
     $stmt = $pdo->prepare("
-    INSERT INTO whatsapp_channels
+    INSERT INTO youtube_channels
     (
 
     channel_code,
@@ -34,11 +34,13 @@ if(isset($_POST['save_channel']))
 
     district,
 
-    category,
+    channel_url,
 
-    channel_link,
+    subscriber_count,
 
-    subscribers,
+    monetization_status,
+
+    verification_status,
 
     status,
 
@@ -59,9 +61,11 @@ if(isset($_POST['save_channel']))
 
     ?,
 
-    ?,
-
     0,
+
+    'pending',
+
+    'pending',
 
     'active',
 
@@ -81,22 +85,20 @@ if(isset($_POST['save_channel']))
 
         $_POST['district'],
 
-        $_POST['category'],
-
-        $_POST['channel_link'],
+        $_POST['channel_url'],
 
         $_SESSION['admin_id']
 
     ]);
 
     $message =
-    'WhatsApp Channel Created Successfully';
+    'YouTube Channel Added Successfully';
 
 }
 
 $channels = $pdo->query("
 SELECT *
-FROM whatsapp_channels
+FROM youtube_channels
 ORDER BY id DESC
 LIMIT 500
 ")->fetchAll();
@@ -109,7 +111,7 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-WhatsApp Channel Management
+YouTube Channel Management
 
 </h3>
 
@@ -125,9 +127,9 @@ WhatsApp Channel Management
 
 <div class="card shadow">
 
-<div class="card-header bg-success text-white">
+<div class="card-header bg-danger text-white">
 
-Create WhatsApp Channel
+Add YouTube Channel
 
 </div>
 
@@ -160,59 +162,15 @@ class="form-control">
 
 </div>
 
-<div class="col-md-3 mb-3">
+<div class="col-md-6 mb-3">
 
-<label>Category</label>
-
-<select
-name="category"
-class="form-control">
-
-<option value="news">
-News
-</option>
-
-<option value="breaking">
-Breaking News
-</option>
-
-<option value="district">
-District News
-</option>
-
-<option value="sports">
-Sports
-</option>
-
-<option value="special">
-Special Coverage
-</option>
-
-</select>
-
-</div>
-
-<div class="col-md-3 mb-3">
-
-<label>Status</label>
+<label>Channel URL</label>
 
 <input
-type="text"
+type="url"
+name="channel_url"
 class="form-control"
-value="Active"
-readonly>
-
-</div>
-
-<div class="col-md-12 mb-3">
-
-<label>Channel Link</label>
-
-<input
-type="text"
-name="channel_link"
-class="form-control"
-placeholder="https://whatsapp.com/channel/...">
+placeholder="https://youtube.com/@channel">
 
 </div>
 
@@ -221,9 +179,9 @@ placeholder="https://whatsapp.com/channel/...">
 <button
 type="submit"
 name="save_channel"
-class="btn btn-success">
+class="btn btn-danger">
 
-Create Channel
+Add Channel
 
 </button>
 
@@ -235,9 +193,9 @@ Create Channel
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-primary text-white">
+<div class="card-header bg-success text-white">
 
-Channel Register
+YouTube Channel Register
 
 </div>
 
@@ -252,10 +210,10 @@ Channel Register
 <tr>
 
 <th>Code</th>
-<th>Channel Name</th>
+<th>Channel</th>
 <th>District</th>
-<th>Category</th>
 <th>Subscribers</th>
+<th>Monetization</th>
 <th>Status</th>
 
 </tr>
@@ -274,9 +232,17 @@ Channel Register
 
 <td><?= htmlspecialchars($channel['district']); ?></td>
 
-<td><?= ucfirst($channel['category']); ?></td>
+<td><?= number_format($channel['subscriber_count']); ?></td>
 
-<td><?= number_format($channel['subscribers']); ?></td>
+<td>
+
+<span class="badge bg-warning">
+
+<?= ucfirst($channel['monetization_status']); ?>
+
+</span>
+
+</td>
 
 <td>
 
@@ -313,15 +279,17 @@ Channel Workflow
 <div class="card-body">
 
 <pre>
-News Published
+Channel Created
       ↓
-WhatsApp Channel
+Videos Published
       ↓
-Subscriber Reach
+Subscribers Grow
       ↓
-Website Traffic
+Watch Time
       ↓
-Analytics
+Monetization
+      ↓
+Revenue
 </pre>
 
 </div>
@@ -340,29 +308,29 @@ Channel Features
 
 <ul>
 
-<li>WhatsApp Channel Management</li>
+<li>YouTube Channel Management</li>
+
+<li>Multiple Channel Support</li>
 
 <li>District Wise Channels</li>
 
-<li>News Distribution</li>
-
-<li>Breaking News Channels</li>
-
-<li>Auto Posting</li>
+<li>News Channels</li>
 
 <li>Subscriber Tracking</li>
 
+<li>Monetization Status</li>
+
+<li>Channel Verification</li>
+
 <li>Growth Analytics</li>
 
-<li>Performance Reports</li>
+<li>Revenue Tracking</li>
 
-<li>Traffic Monitoring</li>
+<li>Channel Reports</li>
 
-<li>Channel Categories</li>
+<li>Watch Time Monitoring</li>
 
-<li>Engagement Reports</li>
-
-<li>Channel Archive</li>
+<li>Brand Channel Management</li>
 
 </ul>
 

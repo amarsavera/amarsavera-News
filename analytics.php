@@ -13,132 +13,35 @@ if(!isset($_SESSION['admin_id']))
     exit;
 }
 
-$fromDate =
-$_GET['from_date']
-?? date('Y-m-01');
+$totalChannels = $pdo->query("
+SELECT COUNT(*)
+FROM youtube_channels
+")->fetchColumn();
 
-$toDate =
-$_GET['to_date']
-?? date('Y-m-d');
+$totalVideos = $pdo->query("
+SELECT COUNT(*)
+FROM youtube_videos
+")->fetchColumn();
 
-/*
-|--------------------------------------------------------------------------
-| Overall Analytics
-|--------------------------------------------------------------------------
-*/
+$totalSubscribers = $pdo->query("
+SELECT COUNT(*)
+FROM youtube_subscribers
+")->fetchColumn();
 
-$summary = $pdo->prepare("
-SELECT
+$totalLiveStreams = $pdo->query("
+SELECT COUNT(*)
+FROM youtube_live_streams
+")->fetchColumn();
 
-COUNT(*) campaigns,
+$totalViews = $pdo->query("
+SELECT COALESCE(SUM(views),0)
+FROM youtube_videos
+")->fetchColumn();
 
-IFNULL(SUM(impressions),0) impressions,
-
-IFNULL(SUM(clicks),0) clicks,
-
-IFNULL(SUM(budget),0) revenue
-
-FROM advertisements
-
-WHERE DATE(created_at)
-BETWEEN ? AND ?
-
-");
-
-$summary->execute([
-$fromDate,
-$toDate
-]);
-
-$data = $summary->fetch();
-
-$ctr = 0;
-
-if($data['impressions']>0)
-{
-    $ctr = round(
-    ($data['clicks']
-    /
-    $data['impressions'])
-    *100,
-    2
-    );
-}
-
-$rpm = 0;
-
-if($data['impressions']>0)
-{
-    $rpm = round(
-    (
-    $data['revenue']
-    /
-    $data['impressions']
-    )*1000,
-    2
-    );
-}
-
-$cpc = 0;
-
-if($data['clicks']>0)
-{
-    $cpc = round(
-    $data['revenue']
-    /
-    $data['clicks'],
-    2
-    );
-}
-
-/*
-|--------------------------------------------------------------------------
-| Top Campaigns
-|--------------------------------------------------------------------------
-*/
-
-$campaigns = $pdo->query("
-SELECT
-
-campaign_name,
-impressions,
-clicks,
-budget
-
-FROM advertisements
-
-ORDER BY impressions DESC
-
-LIMIT 20
-")->fetchAll();
-
-/*
-|--------------------------------------------------------------------------
-| Position Analytics
-|--------------------------------------------------------------------------
-*/
-
-$positions = $pdo->query("
-SELECT
-
-p.position_name,
-
-COUNT(a.id) campaigns,
-
-SUM(a.impressions) impressions,
-
-SUM(a.clicks) clicks
-
-FROM advertisements a
-
-LEFT JOIN advertisement_positions p
-ON p.id=a.position_id
-
-GROUP BY p.id
-
-ORDER BY impressions DESC
-
-")->fetchAll();
+$totalWatchTime = $pdo->query("
+SELECT COALESCE(SUM(watch_time),0)
+FROM youtube_videos
+")->fetchColumn();
 
 include '../layout/header.php';
 
@@ -148,31 +51,37 @@ include '../layout/header.php';
 
 <h3 class="mb-4">
 
-Advertisement Analytics
+YouTube Analytics Dashboard
 
 </h3>
 
 <div class="row">
 
-<div class="col-md-3">
+<div class="col-md-2">
+
+<div class="card border-danger">
+
+<div class="card-body text-center">
+
+<h4><?= number_format($totalChannels); ?></h4>
+
+<p>Channels</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-2">
 
 <div class="card border-primary">
 
 <div class="card-body text-center">
 
-<h3>
+<h4><?= number_format($totalVideos); ?></h4>
 
-<?= number_format(
-$data['impressions']
-); ?>
-
-</h3>
-
-<p>
-
-Impressions
-
-</p>
+<p>Videos</p>
 
 </div>
 
@@ -180,25 +89,15 @@ Impressions
 
 </div>
 
-<div class="col-md-3">
+<div class="col-md-2">
 
 <div class="card border-success">
 
 <div class="card-body text-center">
 
-<h3>
+<h4><?= number_format($totalSubscribers); ?></h4>
 
-<?= number_format(
-$data['clicks']
-); ?>
-
-</h3>
-
-<p>
-
-Clicks
-
-</p>
+<p>Subscribers</p>
 
 </div>
 
@@ -212,17 +111,9 @@ Clicks
 
 <div class="card-body text-center">
 
-<h3>
+<h4><?= number_format($totalViews); ?></h4>
 
-<?= $ctr; ?>%
-
-</h3>
-
-<p>
-
-CTR
-
-</p>
+<p>Total Views</p>
 
 </div>
 
@@ -232,159 +123,13 @@ CTR
 
 <div class="col-md-3">
 
-<div class="card border-danger">
+<div class="card border-info">
 
 <div class="card-body text-center">
 
-<h3>
+<h4><?= number_format($totalWatchTime); ?></h4>
 
-₹<?= number_format(
-$data['revenue']
-);
-?>
-
-</h3>
-
-<p>
-
-Revenue
-
-</p>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="row mt-4">
-
-<div class="col-md-6">
-
-<div class="card shadow">
-
-<div class="card-header bg-success text-white">
-
-Revenue Metrics
-
-</div>
-
-<div class="card-body">
-
-<table class="table table-bordered">
-
-<tr>
-
-<th>
-
-RPM
-
-</th>
-
-<td>
-
-₹<?= $rpm; ?>
-
-</td>
-
-</tr>
-
-<tr>
-
-<th>
-
-CPC
-
-</th>
-
-<td>
-
-₹<?= $cpc; ?>
-
-</td>
-
-</tr>
-
-<tr>
-
-<th>
-
-Campaigns
-
-</th>
-
-<td>
-
-<?= $data['campaigns']; ?>
-
-</td>
-
-</tr>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-md-6">
-
-<div class="card shadow">
-
-<div class="card-header bg-primary text-white">
-
-Top Ad Positions
-
-</div>
-
-<div class="card-body">
-
-<table class="table table-bordered">
-
-<thead>
-
-<tr>
-
-<th>Position</th>
-<th>Impressions</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-<?php foreach($positions as $row): ?>
-
-<tr>
-
-<td>
-
-<?= htmlspecialchars(
-$row['position_name']
-); ?>
-
-</td>
-
-<td>
-
-<?= number_format(
-$row['impressions']
-); ?>
-
-</td>
-
-</tr>
-
-<?php endforeach; ?>
-
-</tbody>
-
-</table>
+<p>Watch Time (Min)</p>
 
 </div>
 
@@ -396,102 +141,179 @@ $row['impressions']
 
 <div class="card shadow mt-4">
 
-<div class="card-header bg-dark text-white">
+<div class="card-header bg-danger text-white">
 
-Top Campaign Performance
+Analytics Summary
 
 </div>
 
 <div class="card-body">
 
-<div class="table-responsive">
-
-<table class="table table-bordered table-hover">
-
-<thead class="table-dark">
+<table class="table table-bordered">
 
 <tr>
-
-<th>Campaign</th>
-<th>Impressions</th>
-<th>Clicks</th>
-<th>CTR</th>
-<th>Budget</th>
-
+<th>Total Channels</th>
+<td><?= number_format($totalChannels); ?></td>
 </tr>
-
-</thead>
-
-<tbody>
-
-<?php foreach($campaigns as $campaign):
-
-$campaignCTR=0;
-
-if($campaign['impressions']>0)
-{
-    $campaignCTR=
-    round(
-    (
-    $campaign['clicks']
-    /
-    $campaign['impressions']
-    )*100,
-    2
-    );
-}
-
-?>
 
 <tr>
-
-<td>
-
-<?= htmlspecialchars(
-$campaign['campaign_name']
-); ?>
-
-</td>
-
-<td>
-
-<?= number_format(
-$campaign['impressions']
-); ?>
-
-</td>
-
-<td>
-
-<?= number_format(
-$campaign['clicks']
-); ?>
-
-</td>
-
-<td>
-
-<?= $campaignCTR; ?>%
-
-</td>
-
-<td>
-
-₹<?= number_format(
-$campaign['budget']
-); ?>
-
-</td>
-
+<th>Total Videos</th>
+<td><?= number_format($totalVideos); ?></td>
 </tr>
 
-<?php endforeach; ?>
+<tr>
+<th>Total Subscribers</th>
+<td><?= number_format($totalSubscribers); ?></td>
+</tr>
 
-</tbody>
+<tr>
+<th>Total Live Streams</th>
+<td><?= number_format($totalLiveStreams); ?></td>
+</tr>
+
+<tr>
+<th>Total Views</th>
+<td><?= number_format($totalViews); ?></td>
+</tr>
+
+<tr>
+<th>Total Watch Time</th>
+<td><?= number_format($totalWatchTime); ?> Minutes</td>
+</tr>
 
 </table>
 
 </div>
+
+</div>
+
+<div class="card shadow mt-4">
+
+<div class="card-header bg-success text-white">
+
+Analytics Modules
+
+</div>
+
+<div class="card-body">
+
+<div class="row">
+
+<div class="col-md-3 mb-2">
+
+<a href="channel-analytics.php"
+class="btn btn-danger w-100">
+
+Channel Analytics
+
+</a>
+
+</div>
+
+<div class="col-md-3 mb-2">
+
+<a href="video-analytics.php"
+class="btn btn-primary w-100">
+
+Video Analytics
+
+</a>
+
+</div>
+
+<div class="col-md-3 mb-2">
+
+<a href="subscriber-analytics.php"
+class="btn btn-success w-100">
+
+Subscriber Analytics
+
+</a>
+
+</div>
+
+<div class="col-md-3 mb-2">
+
+<a href="revenue-analytics.php"
+class="btn btn-warning w-100">
+
+Revenue Analytics
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card shadow mt-4">
+
+<div class="card-header bg-warning text-dark">
+
+Analytics Workflow
+
+</div>
+
+<div class="card-body">
+
+<pre>
+Videos Published
+      ↓
+Views Generated
+      ↓
+Watch Time
+      ↓
+Subscribers Growth
+      ↓
+Revenue
+      ↓
+Analytics Dashboard
+</pre>
+
+</div>
+
+</div>
+
+<div class="card shadow mt-4">
+
+<div class="card-header bg-info text-white">
+
+Analytics Features
+
+</div>
+
+<div class="card-body">
+
+<ul>
+
+<li>Channel Analytics</li>
+
+<li>Video Analytics</li>
+
+<li>Watch Time Reports</li>
+
+<li>Revenue Analytics</li>
+
+<li>Subscriber Growth Analytics</li>
+
+<li>CTR Tracking</li>
+
+<li>Audience Retention</li>
+
+<li>Top Performing Videos</li>
+
+<li>Monetization Reports</li>
+
+<li>YouTube KPI Dashboard</li>
+
+<li>Growth Forecasting</li>
+
+<li>Performance Monitoring</li>
+
+</ul>
 
 </div>
 
